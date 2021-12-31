@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en" class="default-theme">
+  <head>
+    <meta http-equiv="content-type" content="text/html" />
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lighten/Darken Color Tool</title>
+    <meta
+      name="keywords"
+      content="lighten color, brighten color, darken color, increase color brightness, increase color darkness, increase color lightness, decrease color brightness, decrease color darkness, decrease color lightness, color modify, darken, lighten, brighten, darkness, lightness, brightness, white, black, color"
+    />
+    <meta
+      name="description"
+      content="Lighten/Darken any color upto specific amount using the color tool. Enter color in hex or rgb and get different lighter/darker shades of the color."
+    />
+    <link rel="canonical" href="index.html" />
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png" />
+    <link rel="shortcut icon" type="image/png" sizes="192x192" href="../favicon-192x192.png" />
+    <link
+      rel="preload"
+      href="./fonts/BioRhyme-Regular-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href="./fonts/BioRhyme-Regular-latin_ext.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="./fonts/fonts.css" />
+    <link rel="stylesheet" href="./css/normalize.min.css" />
+    <link rel="stylesheet" href="./css/style.css" />
+    <script src="./js/tinycolor.min.js"></script>
+    <script src="./js/app.js"></script>
+    <script src="./js/reinvented-color-wheel-wc.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <section class="part_0">
+        <p class="title">Lighten / Darken Color Tool</p>
+        <p class="description">
+          Lighten/Darken any color upto specific amount using the color tool. Enter color in rgb, hex, hsl or hsv and
+          get different lighter/darker shades of the color.
+        </p>
+      </section>
+      <section class="part_1 row">
+        <div class="left_part">
+          <div class="color_picker">
+            <div class="color_picker_wheel">
+              <reinvented-color-wheel
+                id="rcwColorPicker"
+                hex="#0099dc"
+                wheel-diameter="200"
+                wheel-thickness="20"
+                handle-diameter="16"
+                wheel-reflects-saturation="false"
+                onchange="onColrWhlChnge(this)"
+              ></reinvented-color-wheel>
+            </div>
+            <div class="color_inputs">
+              <div class="color_input">
+                <label for="txtInpHexColor">HEX</label>
+                <input
+                  type="text"
+                  name="ihexValue"
+                  maxlength="7"
+                  id="txtInpHexColor"
+                  oninput="onTxtInpColrChnge('hex', this.value)"
+                  onkeydown="return validateColorKeyCode(event)"
+                  onkeyup="onTxtInpColrKeyUp(event)"
+                  onblur="onTxtInpColrBlur(event)"
+                />
+              </div>
+              <div class="color_input_group">
+                <div class="color_input">
+                  <label for="txtInpRColor">R</label>
+                  <input
+                    class="color_input tri_color_input"
+                    type="number"
+                    min="0"
+                    max="255"
+                    pattern="\d*"
+                    name="irValue"
+                    id="txtInpRColor"
+                    oninput="onTxtInpColrChnge('r', this.value)"
+                    onkeydown="return validateIntegerKeyCode(event)"
+                  />
+                </div>
+                <div class="color_input">
+                  <label for="txtInpGColor">G</label>
+                  <input
+                    class="color_input tri_color_input"
+                    type="number"
+                    min="0"
+                    max="255"
+                    pattern="\d*"
+                    name="igValue"
+                    id="txtInpGColor"
+                    oninput="onTxtInpColrChnge('g', this.value)"
+                    onkeydown="return validateIntegerKeyCode(event)"
+                  />
+                </div>
+                <div class="color_input">
+                  <label for="txtInpBColor">B</label>
+                  <input
+                    class="color_input tri_color_input"
+                    type="number"
+                    min="0"
+                    max="255"
+                    pattern="\d*"
+                    name="ibValue"
+                    id="txtInpBColor"
+                    oninput="onTxtInpColrChnge('b', this.value)"
+                    onkeydown="return validateIntegerKeyCode(event)"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="right_part">
+          <div class="radio_btn_grp">
+            <label class="radio_btn_container"
+              >Lighten
+              <input
+                type="radio"
+                class="radio_btn"
+                name="rbLDOption"
+                id="rbLighten"
+                value="Lighten"
+                checked
+                onchange="onRbOptnChnge(this)"
+              />
+              <span class="checkmark"></span>
+            </label>
+            <label class="radio_btn_container"
+              >Darken
+              <input
+                type="radio"
+                class="radio_btn"
+                name="rbLDOption"
+                id="rbDarken"
+                value="Darken"
+                onchange="onRbOptnChnge(this)"
+              />
+              <span class="checkmark"></span>
+            </label>
+          </div>
+          <div class="slider_container">
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value="10"
+              step="0.4"
+              name="ldSlider"
+              class="slider"
+              id="slider"
+              oninput="onSliderInpChnge(event)"
+            />
+            <input
+              type="number"
+              min="0"
+              max="100"
+              value="10"
+              step="0.4"
+              name="ldSliderValue"
+              class="slider_txt_input"
+              id="sliderInpValue"
+              oninput="onSliderTxtInpChnge(this.value)"
+              onkeyup="onSliderTxtInpKeyPres(event)"
+              onblur="onSliderTxtInpBlur(event)"
+              onkeydown="return validateFloatKeyCode(event)"
+            />
+          </div>
+          <div class="color_preview"></div>
+          <div class="input_group">
+            <span class="icon-link">HEX</span>
+            <input
+              class="txtinput"
+              type="text"
+              name="ohexValue"
+              id="txtOutHexColor"
+              readonly
+              onclick="copyText(event.target.value)"
+            />
+          </div>
+          <div class="input_group">
+            <span class="icon-link">RGB</span>
+            <input
+              class="txtinput"
+              type="text"
+              name="orgbValue"
+              id="txtOutRgbColor"
+              readonly
+              onclick="copyText(event.target.value)"
+            />
+          </div>
+          <div class="input_group">
+            <span class="icon-link">HSL</span>
+            <input
+              class="txtinput"
+              type="text"
+              name="ohslValue"
+              id="txtOutHslColor"
+              readonly
+              onclick="copyText(event.target.value)"
+            />
+          </div>
+          <div class="input_group">
+            <span class="icon-link">HSV</span>
+            <input
+              class="txtinput"
+              type="text"
+              name="ohsvValue"
+              id="txtOutHsvColor"
+              readonly
+              onclick="copyText(event.target.value)"
+            />
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
