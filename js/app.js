@@ -27,6 +27,23 @@ function debounce(func, wait, immediate) {
   }
 }
 
+const showToast = (content = "") => {
+  var toast = document.querySelector(".toast_bar");
+  if (toast.classList.contains("show_toast")) return;
+  let toastTextContainer = document.createElement("div");
+  toastTextContainer.classList.add("toast_msg_container");
+  let toastText = document.createElement("span");
+  toastText.innerHTML = content;
+  toastText.classList.add("toast_message");
+  toastTextContainer.appendChild(toastText);
+  toast.appendChild(toastTextContainer);
+  toast.classList.add("show_toast");
+  setTimeout(function () {
+    toast.classList.remove("show_toast");
+    toast.removeChild(toastTextContainer);
+  }, 2000);
+};
+
 const colorOut = (color = defaultColor, amount = defaultAmount, mode = defaultMode) => {
   color = tinycolor(color);
   var newColor = color;
@@ -118,6 +135,7 @@ const onTxtInpColrKeyUp = (event) => {
   else if (color.length === 6) color = "#" + color;
   else if (color.length < 6) color = "#" + (color + new Array(7).join("9")).substr(0, 6);
   if (keyCode === 13) {
+    event.target.value = "";
     event.target.value = color;
     document.querySelector("#rcwColorPicker").setAttribute("hex", color);
   }
@@ -128,8 +146,18 @@ const onTxtInpColrBlur = (event) => {
   if (color.length === 3) color = color.replaceAll(/([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])/g, "#$1$1$2$2$3$3");
   else if (color.length === 6) color = "#" + color;
   else if (color.length < 6) color = "#" + (color + new Array(7).join("9")).substr(0, 6);
+  event.target.value = "";
   event.target.value = color;
   document.querySelector("#rcwColorPicker").setAttribute("hex", color);
+};
+
+const onTxtInpColrRgbBlur = (event, type = "") => {
+  let value = parseInt(event.target.value.toString().replaceAll(/[^0-9]/g, ""), 10);
+  if (value !== 0 && !value) value = 0;
+  else if (value > 255) value = 255;
+  event.target.value = "";
+  event.target.value = value;
+  onTxtInpColrChnge(type, value);
 };
 
 const onTxtInpColrChnge = (type, value) => {
@@ -233,7 +261,7 @@ const onSliderTxtInpChnge = (value) => {
 const onSliderTxtInpKeyPres = (event) => {
   event.preventDefault();
   let keyCode = event.which || event.keyCode || event.charCode;
-  let value = event.target.value;
+  let value = event.target.value.toString().replaceAll(/[^0-9.]/g, "");
   if (value.toString().includes(".")) value = parseNumber(value);
   else value = parseInt(value, 10);
   if (value !== 0 && !value) value = 0;
@@ -247,7 +275,7 @@ const onSliderTxtInpKeyPres = (event) => {
 };
 
 const onSliderTxtInpBlur = (event) => {
-  let value = event.target.value;
+  let value = event.target.value.toString().replaceAll(/[^0-9.]/g, "");
   if (value.toString().includes(".")) value = parseNumber(value);
   else value = parseInt(value, 10);
   if (value !== 0 && !value) value = 0;
@@ -280,7 +308,7 @@ const copyText = (text) => {
   input.select();
   document.execCommand("copy", false);
   input.remove();
-  alert(`${text} copied to clipboard !`);
+  showToast(`${text} copied!`);
 };
 
 const getParamFromUrl = (paramName) => {

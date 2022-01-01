@@ -74,7 +74,7 @@
                   oninput="onTxtInpColrChnge('hex', this.value)"
                   onkeydown="return validateColorKeyCode(event)"
                   onkeyup="onTxtInpColrKeyUp(event)"
-                  onblur="onTxtInpColrBlur(event)"
+                  onblur="onTxtInpColrBlur(event,'hex')"
                 />
               </div>
               <div class="color_input_group">
@@ -90,6 +90,7 @@
                     id="txtInpRColor"
                     oninput="onTxtInpColrChnge('r', this.value)"
                     onkeydown="return validateIntegerKeyCode(event)"
+                    onblur="onTxtInpColrRgbBlur(event,'r')"
                   />
                 </div>
                 <div class="color_input">
@@ -104,6 +105,7 @@
                     id="txtInpGColor"
                     oninput="onTxtInpColrChnge('g', this.value)"
                     onkeydown="return validateIntegerKeyCode(event)"
+                    onblur="onTxtInpColrRgbBlur(event,'g')"
                   />
                 </div>
                 <div class="color_input">
@@ -118,6 +120,7 @@
                     id="txtInpBColor"
                     oninput="onTxtInpColrChnge('b', this.value)"
                     onkeydown="return validateIntegerKeyCode(event)"
+                    onblur="onTxtInpColrRgbBlur(event,'b')"
                   />
                 </div>
               </div>
@@ -227,5 +230,6 @@
         </div>
       </section>
     </div>
+    <div class="toast_bar"></div>
   </body>
 </html>

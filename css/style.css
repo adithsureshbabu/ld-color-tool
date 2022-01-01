@@ -194,7 +194,6 @@ body {
   width: 100%;
   height: 100px;
   background-color: var(--white);
-  border: 1px solid var(--white3);
   box-shadow: 1px 1px 4px var(--gray);
 }
 .color_picker {
@@ -248,7 +247,7 @@ body {
   font-size: 14px;
   text-align: center;
   border: 1px solid #bbb;
-  outline: 0;
+  outline-color: var(--elfgreen1);
   margin-right: 5px;
   color: var(--black2);
 }
@@ -263,6 +262,7 @@ body {
 .txtinput {
   background: var(--white);
   border: var(--controlborder);
+  color: #333;
   border-radius: 5px;
   outline: 0;
   padding: 10px;
@@ -289,11 +289,86 @@ body {
   align-items: center;
   justify-content: center;
   background: var(--white2);
+  color: var(--elfgreen2);
   border-right: var(--controlborder) !important;
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
   min-width: 58px;
   text-align: center;
+}
+.toast_bar {
+  display: inline-flex;
+  visibility: hidden;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  background-color: #323232;
+  border-radius: 6px;
+  color: #fff;
+  font-family: monospace;
+  text-align: center;
+  min-width: 100px;
+  max-width: 95%;
+  min-height: 36px;
+  max-height: 52px;
+  padding: 0px 5px;
+  position: fixed;
+  left: 50%;
+  bottom: 15px;
+  -webkit-transform: translate(-50%, 0px);
+  transform: translate(-50%, 0px);
+  z-index: 999999;
+}
+.toast_msg_container {
+  position: relative;
+}
+.toast_message {
+  margin: 0px 5px;
+}
+.toast_bar.show_toast {
+  visibility: visible;
+  -webkit-animation: fadeintoast 0.5s, fadeouttoast 0.5s 1.5s;
+  animation: fadeintoast 0.5s, fadeouttoast 0.5s 1.5s;
+}
+@-webkit-keyframes fadeintoast {
+  from {
+    bottom: 0;
+    opacity: 0;
+  }
+  to {
+    bottom: 15px;
+    opacity: 1;
+  }
+}
+@keyframes fadeintoast {
+  from {
+    bottom: 0;
+    opacity: 0;
+  }
+  to {
+    bottom: 15px;
+    opacity: 1;
+  }
+}
+@-webkit-keyframes fadeouttoast {
+  from {
+    bottom: 15px;
+    opacity: 1;
+  }
+  to {
+    bottom: 0;
+    opacity: 0;
+  }
+}
+@keyframes fadeouttoast {
+  from {
+    bottom: 15px;
+    opacity: 1;
+  }
+  to {
+    bottom: 0;
+    opacity: 0;
+  }
 }
 @media (max-width: 582px) {
   .container > section:nth-child(2) {
