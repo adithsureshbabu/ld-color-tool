@@ -347,10 +347,10 @@ const copyText = (text) => {
   showToast(`${text} copied!`);
 };
 
-const getParamFromUrl = (paramName) => {
+const getParamFromUrl = (paramName, url = window.location.search) => {
   paramName = paramName.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
   var regex = new RegExp(`[\\?&]${paramName}=([^&]*)`);
-  var results = regex.exec(window.location.search);
+  var results = regex.exec(url);
   if (!results) return "";
   else return results[1];
 };
