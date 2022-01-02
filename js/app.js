@@ -1,10 +1,11 @@
 let defaultMode = "lighten";
 let defaultColor = "#0099dd";
 let defaultAmount = 10;
+let defaultInvert = false;
 
 window.addEventListener("DOMContentLoaded", (event) => {
-  let { mode, color, amount } = urlQuery();
-  setValues(color, amount, mode);
+  let { mode, color, amount, invert } = urlQuery();
+  setValues(color, amount, mode, invert);
 });
 
 function debounce(func, wait, immediate) {
@@ -27,6 +28,17 @@ function debounce(func, wait, immediate) {
   }
 }
 
+const cleanHexColr = (value = "") => {
+  if (value !== 0 && !value) return;
+  value = String(value)
+    .replaceAll(/[^a-fA-F0-9]/g, "")
+    .substr(0, 6);
+  if (value.length === 3)
+    return `${value.replaceAll(/([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])/g, "#$1$1$2$2$3$3")}`.toLowerCase();
+  else if (value.length === 6) return `#${value}`.toLowerCase();
+  else if (value.length < 6) return `#${value}${new Array(7).join("9")}`.substr(0, 7).toLowerCase();
+};
+
 const showToast = (content = "") => {
   var toast = document.querySelector(".toast_bar");
   if (toast.classList.contains("show_toast")) return;
@@ -46,7 +58,8 @@ const showToast = (content = "") => {
 
 const colorOut = (color = defaultColor, amount = defaultAmount, mode = defaultMode) => {
   color = tinycolor(color);
-  var newColor = color;
+  let { _r, _g, _b } = color;
+  let newColor = color;
   switch (mode.toLowerCase()) {
     case "lighten":
       var amount = (amount * ((1 - color.toHsl().l) * 100)) / 100;
@@ -68,6 +81,9 @@ const colorOut = (color = defaultColor, amount = defaultAmount, mode = defaultMo
       var amount = (amount * (color.toHsl().s * 100)) / 100;
       newColor = color.desaturate(amount);
       break;
+    case "invert":
+      newColor = tinycolor(`rgb(${255 - _r},${255 - _g},${255 - _b})`);
+      break;
     default:
       break;
   }
@@ -79,8 +95,10 @@ const colorOut = (color = defaultColor, amount = defaultAmount, mode = defaultMo
   };
 };
 
-const setValues = (color = defaultColor, amount = defaultAmount, mode = defaultMode) => {
-  let { hex, hsl, hsv, rgb } = colorOut(color, amount, mode);
+const setValues = (color = defaultColor, amount = defaultAmount, mode = defaultMode, invert = defaultInvert) => {
+  let invertColor = color;
+  if (invert) invertColor = colorOut(color, amount, "invert").hex;
+  let { hex, hsl, hsv, rgb } = colorOut(invertColor, amount, mode);
   if (mode.toLowerCase() == "darken") {
     document.querySelector("#rbDarken").checked = true;
     document.querySelector("#rbLighten").checked = false;
@@ -88,6 +106,7 @@ const setValues = (color = defaultColor, amount = defaultAmount, mode = defaultM
     document.querySelector("#rbLighten").checked = true;
     document.querySelector("#rbDarken").checked = false;
   }
+  document.querySelector("#cbInvert").checked = invert;
   document.querySelector("#slider").value = amount;
   document.querySelector("#sliderInpValue").value = amount;
   document.querySelector(".color_preview").style.backgroundColor = rgb;
@@ -101,9 +120,11 @@ const setValues = (color = defaultColor, amount = defaultAmount, mode = defaultM
 const onColrWhelChngeEnd = debounce(function (el, color) {
   let mode = document.querySelector("#rbDarken").checked ? "darken" : "lighten";
   let amount = document.querySelector("#sliderInpValue").value;
+  let invert = document.querySelector("#cbInvert").checked;
   if (amount.toString().includes(".")) amount = parseNumber(amount);
   else amount = parseInt(amount, 10);
-  updateUrlQuery(mode, color.replaceAll("#", ""), amount, 10);
+  updateUrlQuery(mode, color.replaceAll("#", ""), amount, invert);
+  if (invert) color = colorOut(color, amount, "invert").hex;
   let { hex, hsl, hsv, rgb } = colorOut(color, amount, mode);
   document.querySelector(".color_preview").style.backgroundColor = rgb;
   document.querySelector("#txtOutHexColor").value = hex;
@@ -130,10 +151,7 @@ const onColrWhlChnge = (el) => {
 const onTxtInpColrKeyUp = (event) => {
   event.preventDefault();
   let keyCode = event.which || event.keyCode || event.charCode;
-  let color = event.target.value.replaceAll("#", "");
-  if (color.length === 3) color = color.replaceAll(/([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])/g, "#$1$1$2$2$3$3");
-  else if (color.length === 6) color = "#" + color;
-  else if (color.length < 6) color = "#" + (color + new Array(7).join("9")).substr(0, 6);
+  let color = cleanHexColr(event.target.value);
   if (keyCode === 13) {
     event.target.value = "";
     event.target.value = color;
@@ -142,10 +160,7 @@ const onTxtInpColrKeyUp = (event) => {
 };
 
 const onTxtInpColrBlur = (event) => {
-  let color = event.target.value.replaceAll("#", "");
-  if (color.length === 3) color = color.replaceAll(/([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])/g, "#$1$1$2$2$3$3");
-  else if (color.length === 6) color = "#" + color;
-  else if (color.length < 6) color = "#" + (color + new Array(7).join("9")).substr(0, 6);
+  let color = cleanHexColr(event.target.value);
   event.target.value = "";
   event.target.value = color;
   document.querySelector("#rcwColorPicker").setAttribute("hex", color);
@@ -230,9 +245,11 @@ const onSliderInpChngeEnd = debounce(function (value) {
   let mode = document.querySelector("#rbDarken").checked ? "darken" : "lighten";
   let color = document.querySelector("#txtInpHexColor").value;
   let amount = value;
+  let invert = document.querySelector("#cbInvert").checked;
   if (amount.toString().includes(".")) amount = parseNumber(amount);
   else amount = parseInt(amount, 10);
-  updateUrlQuery(mode, color.replaceAll("#", ""), amount);
+  updateUrlQuery(mode, color.replaceAll("#", ""), amount, invert);
+  if (invert) color = colorOut(color, amount, "invert").hex;
   let { hex, hsl, hsv, rgb } = colorOut(color, amount, mode);
   document.querySelector(".color_preview").style.backgroundColor = rgb;
   document.querySelector("#txtOutHexColor").value = hex;
@@ -290,9 +307,28 @@ const onRbOptnChnge = (el) => {
   let mode = el.value.toLowerCase();
   let color = document.querySelector("#txtInpHexColor").value;
   let amount = document.querySelector("#slider").value;
+  let invert = document.querySelector("#cbInvert").checked;
   if (amount.toString().includes(".")) amount = parseNumber(amount);
   else amount = parseInt(amount, 10);
-  updateUrlQuery(mode, color.replaceAll("#", ""), amount);
+  updateUrlQuery(mode, color.replaceAll("#", ""), amount, invert);
+  if (invert) color = colorOut(color, amount, "invert").hex;
+  let { hex, hsl, hsv, rgb } = colorOut(color, amount, mode);
+  document.querySelector(".color_preview").style.backgroundColor = rgb;
+  document.querySelector("#txtOutHexColor").value = hex;
+  document.querySelector("#txtOutRgbColor").value = rgb;
+  document.querySelector("#txtOutHslColor").value = hsl;
+  document.querySelector("#txtOutHsvColor").value = hsv;
+};
+
+const onCbOptnChnge = (el) => {
+  let mode = document.querySelector("#rbDarken").checked ? "darken" : "lighten";
+  let color = document.querySelector("#txtInpHexColor").value;
+  let amount = document.querySelector("#slider").value;
+  let invert = el.checked;
+  if (amount.toString().includes(".")) amount = parseNumber(amount);
+  else amount = parseInt(amount, 10);
+  updateUrlQuery(mode, color.replaceAll("#", ""), amount, invert);
+  if (invert) color = colorOut(color, amount, "invert").hex;
   let { hex, hsl, hsv, rgb } = colorOut(color, amount, mode);
   document.querySelector(".color_preview").style.backgroundColor = rgb;
   document.querySelector("#txtOutHexColor").value = hex;
@@ -328,49 +364,30 @@ const parseNumber = (value = 0, places = 2, multiple = 0.1) => {
 const urlQuery = () => {
   let mode = decodeURIComponent(getParamFromUrl("mode"))
     .replaceAll(/[^a-zA-Z]/g, "")
-    .trim()
     .toLowerCase();
   let color = getParamFromUrl("color")
     .replaceAll(/[^a-fA-F0-9]/g, "")
-    .trim()
     .substr(0, 6);
-  let amount = decodeURIComponent(
-    getParamFromUrl("amount")
-      .toString()
-      .replaceAll(/[^0-9.]/g, "")
-  );
-  if (amount.toString().includes(".")) amount = parseNumber(amount);
-  else amount = parseInt(amount, 10);
+  let amount = decodeURIComponent(String(getParamFromUrl("amount")).replaceAll(/[^0-9.]/g, ""));
+  let invert = decodeURIComponent(String(getParamFromUrl("invert").replaceAll(/[^a-zA-Z]/g, ""))) === "true";
   if (!mode) mode = defaultMode;
-  if (!color) color = defaultColor;
-  else if (color.length === 3) color = color.replaceAll(/([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])/g, "#$1$1$2$2$3$3");
-  else if (color.length === 6) color = "#" + color;
-  else if (color.length < 6) color = "#" + (color + new Array(7).join("9")).substr(0, 6);
+  if (!color) color = defaultColor.toLowerCase();
+  else color = cleanHexColr(color);
+  if (amount.includes(".")) amount = parseNumber(amount);
+  else amount = parseInt(amount, 10);
   if (amount !== 0 && !amount) amount = defaultAmount;
   else if (amount > 100) amount = 100;
-  updateUrlQuery(mode, color.replaceAll("#", ""), amount);
-  return { mode, color, amount };
+  updateUrlQuery(mode, color.replaceAll("#", ""), amount, invert);
+  return { mode, color, amount, invert };
 };
 
-const updateUrlQuery = (mode = defaultMode, color = defaultColor, amount = defaultAmount) => {
-  let q1 = encodeURIComponent(
-    mode
-      .replaceAll(/[^a-zA-Z]/g, "")
-      .trim()
-      .toLowerCase()
-  );
-  let q2 = color
-    .replaceAll(/[^a-fA-F0-9]/g, "")
-    .trim()
-    .toLowerCase();
-  let q3 = encodeURIComponent(
-    amount
-      .toString()
-      .replaceAll(/[^0-9.]/g, "")
-      .trim()
-  );
+const updateUrlQuery = (mode = defaultMode, color = defaultColor, amount = defaultAmount, invert = defaultInvert) => {
+  let q1 = encodeURIComponent(mode.replaceAll(/[^a-zA-Z]/g, "").toLowerCase());
+  let q2 = color.replaceAll(/[^a-fA-F0-9]/g, "").toLowerCase();
+  let q3 = encodeURIComponent(String(amount).replaceAll(/[^0-9.]/g, ""));
+  let q4 = encodeURIComponent(String(invert).replaceAll(/[^a-zA-Z]/g, ""));
   if (history.pushState) {
-    let new_url = `${window.location.protocol}//${window.location.host}${window.location.pathname}?mode=${q1}&color=${q2}&amount=${q3}`;
+    let new_url = `${window.location.protocol}//${window.location.host}${window.location.pathname}?mode=${q1}&color=${q2}&amount=${q3}&invert=${q4}`;
     window.history.pushState({ path: new_url }, "", new_url);
   }
 };

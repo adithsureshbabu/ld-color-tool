@@ -8,11 +8,11 @@
     <title>Lighten/Darken Color Tool</title>
     <meta
       name="keywords"
-      content="lighten color, brighten color, darken color, increase color brightness, increase color darkness, increase color lightness, decrease color brightness, decrease color darkness, decrease color lightness, color modify, darken, lighten, brighten, darkness, lightness, brightness, white, black, color"
+      content="lighten color, brighten color, darken color, increase color brightness, increase color darkness, increase color lightness, decrease color brightness, decrease color darkness, decrease color lightness, color modify, darken, lighten, brighten, darkness, lightness, brightness, white, black, color, invert color, opposite color"
     />
     <meta
       name="description"
-      content="Lighten/Darken any color upto specific amount using the color tool. Enter color in hex or rgb and get different lighter/darker shades of the color."
+      content="Lighten/Darken, Invert, any color upto specific amount using the color tool. Enter color in hex or rgb and get different lighter/darker shades of the color."
     />
     <link rel="canonical" href="index.html" />
     <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png" />
@@ -128,29 +128,41 @@
           </div>
         </div>
         <div class="right_part">
-          <div class="radio_btn_grp">
-            <label class="radio_btn_container"
+          <div class="check_btn_grp">
+            <label class="check_btn_container"
               >Lighten
               <input
                 type="radio"
-                class="radio_btn"
+                class="check_btn"
                 name="rbLDOption"
                 id="rbLighten"
                 value="Lighten"
                 checked
                 onchange="onRbOptnChnge(this)"
               />
-              <span class="checkmark"></span>
+              <span class="checkmark check_radio"></span>
             </label>
-            <label class="radio_btn_container"
+            <label class="check_btn_container"
               >Darken
               <input
                 type="radio"
-                class="radio_btn"
+                class="check_btn"
                 name="rbLDOption"
                 id="rbDarken"
                 value="Darken"
                 onchange="onRbOptnChnge(this)"
+              />
+              <span class="checkmark check_radio"></span>
+            </label>
+            <label class="check_btn_container"
+              >Invert
+              <input
+                type="checkbox"
+                class="check_btn"
+                name="cbOption"
+                id="cbInvert"
+                value="Invert"
+                onchange="onCbOptnChnge(this)"
               />
               <span class="checkmark"></span>
             </label>
