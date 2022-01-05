@@ -40,23 +40,6 @@ const cleanHexColr = (value = "") => {
   else if (value.length < 6) return `#${value}${new Array(7).join("9")}`.substr(0, 7).toLowerCase();
 };
 
-const showToast = (content = "") => {
-  let toast = document.querySelector(".toast_bar");
-  if (toast.classList.contains("show_toast")) return;
-  let toastTextContainer = document.createElement("div");
-  toastTextContainer.classList.add("toast_msg_container");
-  let toastText = document.createElement("span");
-  toastText.innerText = content;
-  toastText.classList.add("toast_message");
-  toastTextContainer.appendChild(toastText);
-  toast.appendChild(toastTextContainer);
-  toast.classList.add("show_toast");
-  setTimeout(() => {
-    toast.classList.remove("show_toast");
-    toast.removeChild(toastTextContainer);
-  }, 2000);
-};
-
 const colorOut = (color = defaultColor, amount = defaultAmount, mode = defaultMode) => {
   color = tinycolor(color);
   let { _r, _g, _b } = color;
@@ -327,21 +310,35 @@ const onCbOptnChnge = (el) => {
   document.querySelector("#txtOutHsvColor").value = hsv;
 };
 
-const copyText = debounce((text) => {
+const copyText = debounce((text, tooltipId) => {
   let input = document.createElement("input");
   document.body.appendChild(input);
   input.value = text;
+  let tooltips = document.querySelectorAll(".tooltip");
+  for (let i = 0; i < tooltips.length; i++) {
+    if (tooltips[i].id === tooltipId) continue;
+    if (tooltips[i].classList.contains("showtip")) tooltips[i].classList.remove("showtip");
+  }
+  let tooltipEl = document.querySelector(`#${tooltipId}`);
   input.select();
   if (window.navigator.clipboard) {
     window.navigator.clipboard
       .writeText(text)
       .then(() => {
-        showToast(`${text} copied!`);
+        if (tooltipEl.classList.contains("showtip")) return;
+        tooltipEl.classList.add("showtip");
+        setTimeout(() => {
+          tooltipEl.classList.remove("showtip");
+        }, 2000);
       })
       .catch((err) => console.log(err));
   } else if (document.execCommand) {
     document.execCommand("copy", false);
-    showToast(`${text} copied!`);
+    if (tooltipEl.classList.contains("showtip")) return;
+    tooltipEl.classList.add("showtip");
+    setTimeout(() => {
+      tooltipEl.classList.remove("showtip");
+    }, 2000);
   }
   input.remove();
 });

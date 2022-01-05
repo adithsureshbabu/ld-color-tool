@@ -508,90 +508,103 @@ label.switch input[type="checkbox"]:focus + .track {
   -webkit-user-select: none;
   user-select: none;
 }
-.toast_bar {
-  display: -webkit-inline-box;
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-  visibility: hidden;
-  overflow: hidden;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  background-color: #212121;
-  -webkit-border-radius: 6px;
-  border-radius: 6px;
-  font-family: monospace;
-  text-align: center;
-  min-width: 100px;
-  max-width: 95%;
-  min-height: 36px;
-  max-height: 52px;
-  padding: 0px 5px;
-  position: fixed;
-  left: 50%;
-  bottom: 15px;
-  -webkit-transform: translate(-50%, 0px);
-  -ms-transform: translate(-50%, 0px);
-  transform: translate(-50%, 0px);
-  z-index: 999999;
+.input_group > span.tooltip {
+  min-width: auto;
+  border-radius: 0 5px 5px 0;
+  border-right: none !important;
+  border-left: var(--controlborder) !important;
+  background: var(--teal0);
 }
-.toast_msg_container {
+.tooltip {
   position: relative;
+  display: inline-block;
 }
-.toast_message {
-  color: #fff;
-  margin: 0px 5px;
+.tooltip.bottom:before {
+  bottom: -7px;
+  border-bottom-color: #212121;
 }
-.toast_bar.show_toast {
-  visibility: visible;
-  -webkit-animation: fadeintoast 0.5s, fadeouttoast 0.5s 1.5s;
-  animation: fadeintoast 0.5s, fadeouttoast 0.5s 1.5s;
+.tooltip.showtip:before,
+.tooltip.showtip:after,
+.tooltip:focus:before,
+.tooltip:focus:after {
+  opacity: 1;
+  clip: auto;
+  -webkit-clip-path: inset(0%);
+  clip-path: inset(0%);
 }
-@-webkit-keyframes fadeintoast {
-  from {
-    bottom: 0;
-    opacity: 0;
-  }
-  to {
-    bottom: 15px;
-    opacity: 1;
-  }
+.tooltip.bottom:before,
+.tooltip.bottom:after {
+  top: 75%;
 }
-@keyframes fadeintoast {
-  from {
-    bottom: 0;
-    opacity: 0;
-  }
-  to {
-    bottom: 15px;
-    opacity: 1;
-  }
+.tooltip:before {
+  content: "";
+  background: transparent;
+  border: 0.5rem solid transparent;
+  left: calc(50% - 0.5rem);
 }
-@-webkit-keyframes fadeouttoast {
-  from {
-    bottom: 15px;
-    opacity: 1;
-  }
-  to {
-    bottom: 0;
-    opacity: 0;
-  }
+.tooltip:before,
+.tooltip:after {
+  position: absolute;
+  opacity: 0;
+  clip: rect(0 0 0 0);
+  -webkit-clip-path: inset(100%);
+  clip-path: inset(100%);
+  transition: all 0.3s;
+  z-index: 1010;
+  left: 50%;
 }
-@keyframes fadeouttoast {
-  from {
-    bottom: 15px;
-    opacity: 1;
-  }
-  to {
-    bottom: 0;
-    opacity: 0;
-  }
+.tooltip.bottom:after {
+  margin-top: calc(2 * 0.5rem);
+}
+.tooltip.showtip:before,
+.tooltip.showtip:after,
+.tooltip:focus:before,
+.tooltip:focus:after {
+  opacity: 1;
+  clip: auto;
+  -webkit-clip-path: inset(0%);
+  clip-path: inset(0%);
+}
+.tooltip.bottom:before,
+.tooltip.bottom:after {
+  top: 75%;
+}
+.tooltip:after {
+  content: attr(aria-label);
+  color: #fafafa;
+  background: #212121;
+  border-radius: 0.125rem;
+  padding: 0.5rem;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  border-radius: 6px;
+}
+.tooltip:before,
+.tooltip:after {
+  position: absolute;
+  opacity: 0;
+  clip: rect(0 0 0 0);
+  -webkit-clip-path: inset(100%);
+  clip-path: inset(100%);
+  transition: all 0.3s;
+  z-index: 1010;
+  left: 50%;
+  font-size: 14px;
+}
+.tooltip:not(.bottom):before {
+  border-top-color: #212121;
+  top: -7px;
+}
+.tooltip:not(.bottom):before,
+.tooltip:not(.bottom):after {
+  bottom: 75%;
+}
+.tooltip:not(.bottom):after {
+  margin-bottom: calc(2 * 0.5rem);
+}
+.tooltip:not(.bottom):before,
+.tooltip:not(.bottom):after {
+  bottom: 75%;
 }
 @media (max-width: 425px) {
   .radio_btn_grp label {

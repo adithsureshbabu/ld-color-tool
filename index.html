@@ -192,52 +192,55 @@
           <div class="color_preview darkmode-ignore"></div>
           <div class="input_group">
             <span class="icon-link">HEX</span>
-            <input
-              class="txtinput"
-              type="text"
-              name="ohexValue"
-              id="txtOutHexColor"
-              readonly
-              onclick="copyText(event.target.value)"
-            />
+            <input class="txtinput" type="text" name="ohexValue" id="txtOutHexColor" readonly />
+            <span
+              id="hexOutToolTip"
+              class="tooltip"
+              aria-label="Copied!"
+              style="margin-left: 20px"
+              onclick="copyText(document.querySelector('#txtOutHexColor').value, 'hexOutToolTip')"
+              >📋</span
+            >
           </div>
           <div class="input_group">
             <span class="icon-link">RGB</span>
-            <input
-              class="txtinput"
-              type="text"
-              name="orgbValue"
-              id="txtOutRgbColor"
-              readonly
-              onclick="copyText(event.target.value)"
-            />
+            <input class="txtinput" type="text" name="orgbValue" id="txtOutRgbColor" readonly />
+            <span
+              id="rgbOutToolTip"
+              class="tooltip"
+              aria-label="Copied!"
+              style="margin-left: 20px"
+              onclick="copyText(document.querySelector('#txtOutRgbColor').value, 'rgbOutToolTip')"
+              >📋</span
+            >
           </div>
           <div class="input_group">
             <span class="icon-link">HSL</span>
-            <input
-              class="txtinput"
-              type="text"
-              name="ohslValue"
-              id="txtOutHslColor"
-              readonly
-              onclick="copyText(event.target.value)"
-            />
+            <input class="txtinput" type="text" name="ohslValue" id="txtOutHslColor" readonly />
+            <span
+              id="hslOutToolTip"
+              class="tooltip"
+              aria-label="Copied!"
+              style="margin-left: 20px"
+              onclick="copyText(document.querySelector('#txtOutHslColor').value, 'hslOutToolTip')"
+              >📋</span
+            >
           </div>
           <div class="input_group">
             <span class="icon-link">HSV</span>
-            <input
-              class="txtinput"
-              type="text"
-              name="ohsvValue"
-              id="txtOutHsvColor"
-              readonly
-              onclick="copyText(event.target.value)"
-            />
+            <input class="txtinput" type="text" name="ohsvValue" id="txtOutHsvColor" readonly />
+            <span
+              id="hsvOutToolTip"
+              class="tooltip"
+              aria-label="Copied!"
+              style="margin-left: 20px"
+              onclick="copyText(document.querySelector('#txtOutHsvColor').value, 'hsvOutToolTip')"
+              >📋</span
+            >
           </div>
         </div>
       </section>
     </div>
-    <div class="toast_bar"></div>
   </body>
   <!-- <script>
     let dmScript = document.createElement("script");
