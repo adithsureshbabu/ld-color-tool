@@ -19,6 +19,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png" />
     <link rel="shortcut icon" type="image/png" sizes="192x192" href="../favicon-192x192.png" />
+    <script src="./js/preloader.js"></script>
     <link
       rel="preload"
       href="./fonts/BioRhyme-Regular-latin.woff2"
@@ -53,6 +54,14 @@
     </script>
   </head>
   <body>
+    <div class="loader" oncontextmenu="return false;">
+      <div class="loader_ellipsis">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
     <div class="container">
       <section class="part_0">
         <p class="title">Lighten / Darken Color Tool</p>
@@ -234,9 +243,9 @@
     let dmScript = document.createElement("script");
     dmScript.src = "https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js";
     document.head.appendChild(dmScript);
-    let dmStylesheet = `.darkmode-toggle { z-index: 99999999; }`;
+    let dmStylesheet = `.darkmode-toggle { z-index: 999; }`;
     //uncomment below line if darkmode doesnot work for some elements
-    // dmStylesheet+=`.darkmode-layer { z-index: 99999999; }`
+    // dmStylesheet+=`.darkmode-layer { z-index: 999; }`
     let dmStyle = document.createElement("style");
     dmStyle.type = "text/css";
     dmStyle.innerText = dmStylesheet;
