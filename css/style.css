@@ -523,10 +523,9 @@ label.switch input[type="checkbox"]:focus + .track {
   -webkit-justify-content: center;
   -ms-flex-pack: center;
   justify-content: center;
-  background-color: #323232;
+  background-color: #212121;
   -webkit-border-radius: 6px;
   border-radius: 6px;
-  color: #fff;
   font-family: monospace;
   text-align: center;
   min-width: 100px;
@@ -546,6 +545,7 @@ label.switch input[type="checkbox"]:focus + .track {
   position: relative;
 }
 .toast_message {
+  color: #fff;
   margin: 0px 5px;
 }
 .toast_bar.show_toast {

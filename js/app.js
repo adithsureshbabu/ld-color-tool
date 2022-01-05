@@ -327,15 +327,24 @@ const onCbOptnChnge = (el) => {
   document.querySelector("#txtOutHsvColor").value = hsv;
 };
 
-const copyText = (text) => {
+const copyText = debounce((text) => {
   let input = document.createElement("input");
   document.body.appendChild(input);
   input.value = text;
   input.select();
-  document.execCommand("copy", false);
+  if (window.navigator.clipboard) {
+    window.navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        showToast(`${text} copied!`);
+      })
+      .catch((err) => console.log(err));
+  } else if (document.execCommand) {
+    document.execCommand("copy", false);
+    showToast(`${text} copied!`);
+  }
   input.remove();
-  showToast(`${text} copied!`);
-};
+});
 
 const getParamFromUrl = (param = "", type = "") => {
   let queryString = window.location.href.split("?").pop();

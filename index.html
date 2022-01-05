@@ -247,7 +247,6 @@
     //uncomment below line if darkmode doesnot work for some elements
     // dmStylesheet+=`.darkmode-layer { z-index: 999; }`
     let dmStyle = document.createElement("style");
-    dmStyle.type = "text/css";
     dmStyle.innerText = dmStylesheet;
     document.head.appendChild(dmStyle);
     const addDarkmodeWidget = () => {
