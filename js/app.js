@@ -338,7 +338,7 @@ const copyText = (text) => {
 };
 
 const getParamFromUrl = (param = "", type = "") => {
-  let queryString = window.location.href.split("/").pop();
+  let queryString = window.location.href.split("?").pop();
   param = new URLSearchParams(queryString).get(param);
   if (!param) return "";
   param = decodeURIComponent(param).toLowerCase();

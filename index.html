@@ -43,7 +43,7 @@
       var ga = document.createElement("script");
       ga.async = true;
       ga.src = "https://www.googletagmanager.com/gtag/js?id=G-GJCHG84XCY";
-      document.getElementsByTagName("head")[0].appendChild(ga);
+      document.head.appendChild(ga);
       window.dataLayer = window.dataLayer || [];
       window.gtag = function () {
         window.dataLayer.push(arguments);
@@ -141,42 +141,16 @@
         </div>
         <div class="right_part">
           <div class="check_btn_grp">
-            <label class="check_btn_container"
-              >Lighten
-              <input
-                type="radio"
-                class="check_btn"
-                name="rbLDOption"
-                id="rbLighten"
-                value="Lighten"
-                checked
-                onchange="onRbOptnChnge(this)"
-              />
-              <span class="checkmark check_radio"></span>
-            </label>
-            <label class="check_btn_container"
-              >Darken
-              <input
-                type="radio"
-                class="check_btn"
-                name="rbLDOption"
-                id="rbDarken"
-                value="Darken"
-                onchange="onRbOptnChnge(this)"
-              />
-              <span class="checkmark check_radio"></span>
-            </label>
-            <label class="check_btn_container"
-              >Invert
-              <input
-                type="checkbox"
-                class="check_btn"
-                name="cbOption"
-                id="cbInvert"
-                value="Invert"
-                onchange="onCbOptnChnge(this)"
-              />
-              <span class="checkmark"></span>
+            <div class="radio_btn_grp">
+              <input type="radio" id="rbLighten" name="rbLDOption" value="Lighten" onchange="onRbOptnChnge(this)" />
+              <label for="rbLighten">Lighten</label>
+              <input type="radio" id="rbDarken" name="rbLDOption" value="Darken" onchange="onRbOptnChnge(this)" />
+              <label for="rbDarken">Darken</label>
+            </div>
+            <label for="cbInvert" class="switch" style="display: flex; flex-direction: row; align-items: center">
+              <input type="checkbox" name="cbOption" id="cbInvert" value="Invert" onchange="onCbOptnChnge(this)" />
+              <span class="track"><span class="thumb"></span></span>
+              <span class="labeltxt">Invert</span>
             </label>
           </div>
           <div class="slider_container">
@@ -206,7 +180,7 @@
               onkeydown="return validateFloatKeyCode(event)"
             />
           </div>
-          <div class="color_preview"></div>
+          <div class="color_preview darkmode-ignore"></div>
           <div class="input_group">
             <span class="icon-link">HEX</span>
             <input
@@ -256,4 +230,28 @@
     </div>
     <div class="toast_bar"></div>
   </body>
+  <!-- <script>
+    let dmScript = document.createElement("script");
+    dmScript.src = "https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js";
+    document.head.appendChild(dmScript);
+    let dmStylesheet = `.darkmode-toggle { z-index: 99999999; }`;
+    //uncomment below line if darkmode doesnot work for some elements
+    // dmStylesheet+=`.darkmode-layer { z-index: 99999999; }`
+    let dmStyle = document.createElement("style");
+    dmStyle.type = "text/css";
+    dmStyle.innerText = dmStylesheet;
+    document.head.appendChild(dmStyle);
+    const addDarkmodeWidget = () => {
+      window.darkmode = new Darkmode({ label: "🌓" });
+      window.darkmode.showWidget();
+      let dmBg = document.querySelector(".darkmode-background");
+      if (dmBg) dmBg.remove();
+      return;
+    };
+    let stateCheck = setInterval(() => {
+      if (document.readyState !== "complete") return;
+      clearInterval(stateCheck);
+      addDarkmodeWidget();
+    }, 100);
+  </script> -->
 </html>
