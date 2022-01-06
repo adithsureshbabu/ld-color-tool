@@ -1,14 +1,3 @@
-document.onreadystatechange = () => {
-  if (document.readyState !== "complete") return;
-  document.querySelector(".loader").style.opacity = "0";
-  document.body.style.background = `url(./img/bg.jpg) repeat fixed top center`;
-  document.body.style.backgroundColor = "var(--teal3)";
-  document.querySelector(".container").style.display = "flex";
-  setTimeout(() => {
-    document.querySelector(".loader").style.display = "none";
-  }, 500);
-};
-
 const loaderStylesheet = `
 .loader {
     background-color: #eee;

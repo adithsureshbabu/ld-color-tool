@@ -85,6 +85,7 @@
               ></reinvented-color-wheel>
             </div>
             <div class="color_inputs">
+              <div class="inp_color_preview darkmode-ignore"></div>
               <div class="color_input">
                 <label for="txtInpHexColor">HEX</label>
                 <input
@@ -167,7 +168,7 @@
               type="range"
               min="0"
               max="100"
-              value="10"
+              value="40"
               step="0.4"
               name="ldSlider"
               class="slider"
@@ -178,7 +179,7 @@
               type="number"
               min="0"
               max="100"
-              value="10"
+              value="40"
               step="0.4"
               name="ldSliderValue"
               class="slider_txt_input"
@@ -189,7 +190,7 @@
               onkeydown="return validateFloatKeyCode(event)"
             />
           </div>
-          <div class="color_preview darkmode-ignore"></div>
+          <div class="out_color_preview darkmode-ignore"></div>
           <div class="input_group">
             <span class="icon-link">HEX</span>
             <input class="txtinput" type="text" name="ohexValue" id="txtOutHexColor" readonly />

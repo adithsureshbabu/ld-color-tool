@@ -1,14 +1,23 @@
 let domLoaded = false;
 let defaultMode = "lighten";
 let defaultColor = "#0099dd";
-let defaultAmount = 10;
+let defaultAmount = 40;
 let defaultInvert = false;
 
-window.addEventListener("DOMContentLoaded", (event) => {
+let docLoad = setInterval(() => {
+  if (document.readyState !== "complete") return;
+  clearInterval(docLoad);
   domLoaded = true;
   let { mode, color, amount, invert } = urlQuery();
   setValues(color, amount, mode, invert);
-});
+  document.body.style.background = `url(./img/bg.jpg) repeat fixed top center`;
+  document.body.style.backgroundColor = "var(--teal3)";
+  document.querySelector(".container").style.display = "flex";
+  document.querySelector(".loader").style.opacity = "0";
+  setTimeout(() => {
+    document.querySelector(".loader").style.display = "none";
+  }, 500);
+}, 100);
 
 const debounce = (fn, wait = 250, immediate = false) => {
   try {
@@ -92,12 +101,13 @@ const setValues = (color = defaultColor, amount = defaultAmount, mode = defaultM
   document.querySelector("#cbInvert").checked = invert;
   document.querySelector("#slider").value = amount;
   document.querySelector("#sliderInpValue").value = amount;
-  document.querySelector(".color_preview").style.backgroundColor = rgb;
+  document.querySelector(".out_color_preview").style.backgroundColor = rgb;
   document.querySelector("#txtOutHexColor").value = hex;
   document.querySelector("#txtOutRgbColor").value = rgb;
   document.querySelector("#txtOutHslColor").value = hsl;
   document.querySelector("#txtOutHsvColor").value = hsv;
   document.querySelector("#rcwColorPicker").setAttribute("hex", color);
+  document.querySelector(".inp_color_preview").style.backgroundColor = color;
 };
 
 const onColrWhlChnge = (el) => {
@@ -106,7 +116,10 @@ const onColrWhlChnge = (el) => {
     let rgbColor = el.getAttribute("rgb");
     if (rgbColor) rgbColor = rgbColor.split(",");
     if (!domLoaded) return;
-    if (color) document.querySelector("#txtInpHexColor").value = color;
+    if (color) {
+      document.querySelector("#txtInpHexColor").value = color;
+      document.querySelector(".inp_color_preview").style.backgroundColor = color;
+    }
     if (typeof rgbColor === "object" && rgbColor.length > 0) {
       document.querySelector("#txtInpRColor").value = rgbColor[0];
       document.querySelector("#txtInpGColor").value = rgbColor[1];
@@ -122,10 +135,11 @@ const onColrWhelChngeEnd = debounce((el, color) => {
   let mode = document.querySelector("#rbDarken").checked ? "darken" : "lighten";
   let amount = parseNumber(document.querySelector("#sliderInpValue").value);
   let invert = document.querySelector("#cbInvert").checked;
+  document.querySelector(".inp_color_preview").style.backgroundColor = color;
   updateUrlQuery(mode, color.replace(/#/g, ""), amount, invert);
   if (invert) color = colorOut(color, amount, "invert").hex;
   let { hex, hsl, hsv, rgb } = colorOut(color, amount, mode);
-  document.querySelector(".color_preview").style.backgroundColor = rgb;
+  document.querySelector(".out_color_preview").style.backgroundColor = rgb;
   document.querySelector("#txtOutHexColor").value = hex;
   document.querySelector("#txtOutRgbColor").value = rgb;
   document.querySelector("#txtOutHslColor").value = hsl;
@@ -233,7 +247,7 @@ const onSliderInpChngeEnd = debounce((value) => {
   updateUrlQuery(mode, color.replace(/#/g, ""), amount, invert);
   if (invert) color = colorOut(color, amount, "invert").hex;
   let { hex, hsl, hsv, rgb } = colorOut(color, amount, mode);
-  document.querySelector(".color_preview").style.backgroundColor = rgb;
+  document.querySelector(".out_color_preview").style.backgroundColor = rgb;
   document.querySelector("#txtOutHexColor").value = hex;
   document.querySelector("#txtOutRgbColor").value = rgb;
   document.querySelector("#txtOutHslColor").value = hsl;
@@ -288,7 +302,7 @@ const onRbOptnChnge = (el) => {
   updateUrlQuery(mode, color.replace(/#/g, ""), amount, invert);
   if (invert) color = colorOut(color, amount, "invert").hex;
   let { hex, hsl, hsv, rgb } = colorOut(color, amount, mode);
-  document.querySelector(".color_preview").style.backgroundColor = rgb;
+  document.querySelector(".out_color_preview").style.backgroundColor = rgb;
   document.querySelector("#txtOutHexColor").value = hex;
   document.querySelector("#txtOutRgbColor").value = rgb;
   document.querySelector("#txtOutHslColor").value = hsl;
@@ -303,7 +317,7 @@ const onCbOptnChnge = (el) => {
   updateUrlQuery(mode, color.replace(/#/g, ""), amount, invert);
   if (invert) color = colorOut(color, amount, "invert").hex;
   let { hex, hsl, hsv, rgb } = colorOut(color, amount, mode);
-  document.querySelector(".color_preview").style.backgroundColor = rgb;
+  document.querySelector(".out_color_preview").style.backgroundColor = rgb;
   document.querySelector("#txtOutHexColor").value = hex;
   document.querySelector("#txtOutRgbColor").value = rgb;
   document.querySelector("#txtOutHslColor").value = hsl;
