@@ -10,7 +10,7 @@ let docLoad = setInterval(() => {
   domLoaded = true;
   let { mode, color, amount, invert } = urlQuery();
   setValues(color, amount, mode, invert);
-  document.body.style.background = `url(./img/bg.jpg) repeat fixed top center`;
+  document.querySelector(".blurred_full_bg").style.background = `url(./img/bg.jpg) repeat fixed top center`;
   document.body.style.backgroundColor = "var(--teal3)";
   document.querySelector(".container").style.display = "flex";
   document.querySelector(".loader").style.opacity = "0";
