@@ -43,8 +43,7 @@ const cleanHexColr = (value = "") => {
   value = String(value)
     .replace(/[^a-fA-F0-9]/g, "")
     .substr(0, 6);
-  if (value.length === 3)
-    return `${value.replace(/([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])/g, "#$1$1$2$2$3$3")}`.toLowerCase();
+  if (value.length === 3) return `${value.replace(/([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])/g, "#$1$1$2$2$3$3")}`.toLowerCase();
   else if (value.length === 6) return `#${value}`.toLowerCase();
   else if (value.length < 6) return `#${value}${new Array(7).join("9")}`.substr(0, 7).toLowerCase();
 };
@@ -100,6 +99,7 @@ const setValues = (color = defaultColor, amount = defaultAmount, mode = defaultM
   }
   document.querySelector("#cbInvert").checked = invert;
   document.querySelector("#slider").value = amount;
+  styleSlider(document.querySelector("#slider"));
   document.querySelector("#sliderInpValue").value = amount;
   document.querySelector(".out_color_preview").style.backgroundColor = rgb;
   document.querySelector("#txtOutHexColor").value = hex;
@@ -254,7 +254,17 @@ const onSliderInpChngeEnd = debounce((value) => {
   document.querySelector("#txtOutHsvColor").value = hsv;
 });
 
+const styleSlider = (target) => {
+  var add = 0;
+  if (target.value > 75) add = -1;
+  if (target.value < 25) add = 1;
+  var stylePercent = ((target.value - target.min) / (target.max - target.min)) * 100 + add;
+  target.style.background =
+    "linear-gradient(to right, var(--teal2) 0%, var(--teal2) " + stylePercent + "%, #fff " + stylePercent + "%, white 100%)";
+};
+
 const onSliderInpChnge = (event) => {
+  styleSlider(event.target);
   let value = parseNumber(event.target.value);
   if (value > 99.2) event.target.step = 0.1;
   else event.target.step = 0.4;
@@ -267,6 +277,7 @@ const onSliderTxtInpChnge = (value) => {
   if (value !== 0 && !value) return;
   else if (value > 100) value = 100;
   document.querySelector("#slider").value = value;
+  styleSlider(document.querySelector("#slider"));
   onSliderInpChngeEnd(value);
 };
 
@@ -280,6 +291,7 @@ const onSliderTxtInpKeyPres = (event) => {
     event.target.value = "";
     event.target.value = value;
     document.querySelector("#slider").value = value;
+    styleSlider(document.querySelector("#slider"));
     onSliderInpChngeEnd(value);
   }
 };
@@ -291,6 +303,7 @@ const onSliderTxtInpBlur = (event) => {
   event.target.value = "";
   event.target.value = value;
   document.querySelector("#slider").value = value;
+  styleSlider(document.querySelector("#slider"));
   onSliderInpChngeEnd(value);
 };
 
@@ -368,9 +381,7 @@ const getParamFromUrl = (param = "", type = "") => {
 };
 
 const parseNumber = (value = 0, places = 2, multiple = 0.1) => {
-  return Number(
-    (Math.ceil(parseFloat(value.toString().replace(/[^0-9.]/g, "")) / multiple) * multiple).toFixed(places)
-  );
+  return Number((Math.ceil(parseFloat(value.toString().replace(/[^0-9.]/g, "")) / multiple) * multiple).toFixed(places));
 };
 
 const urlQuery = () => {

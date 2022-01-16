@@ -21,20 +21,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="shortcut icon" type="image/png" sizes="192x192" href="/favicon-192x192.png" />
     <script src="./js/preloader.js"></script>
-    <link
-      rel="preload"
-      href="./fonts/BioRhyme-Regular-latin.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="./fonts/BioRhyme-Regular-latin_ext.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
+    <link rel="preload" href="./fonts/BioRhyme-Regular-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./fonts/BioRhyme-Regular-latin_ext.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
     <link rel="stylesheet" href="./fonts/fonts.css" />
     <link rel="stylesheet" href="./css/normalize.min.css" />
     <link rel="stylesheet" href="./css/style.css" />
@@ -68,8 +56,8 @@
       <section class="part_0">
         <p class="title">Lighten / Darken Color Tool</p>
         <p class="description">
-          Lighten/Darken any color upto specific amount using the color tool. Enter color in rgb, hex, hsl or hsv and
-          get different lighter/darker shades of the color.
+          Lighten/Darken any color upto specific amount using the color tool. Enter color in rgb, hex, hsl or hsv and get
+          different lighter/darker shades of the color.
         </p>
       </section>
       <section class="part_1 row">
@@ -152,94 +140,98 @@
           </div>
         </div>
         <div class="right_part">
-          <div class="check_btn_grp">
-            <div class="radio_btn_grp">
-              <input type="radio" id="rbLighten" name="rbLDOption" value="Lighten" onchange="onRbOptnChnge(this)" />
-              <label for="rbLighten">Lighten</label>
-              <input type="radio" id="rbDarken" name="rbLDOption" value="Darken" onchange="onRbOptnChnge(this)" />
-              <label for="rbDarken">Darken</label>
+          <div class="color_confs">
+            <div class="check_btn_grp">
+              <div class="radio_btn_grp">
+                <input type="radio" id="rbLighten" name="rbLDOption" value="Lighten" onchange="onRbOptnChnge(this)" />
+                <label for="rbLighten">Lighten</label>
+                <input type="radio" id="rbDarken" name="rbLDOption" value="Darken" onchange="onRbOptnChnge(this)" />
+                <label for="rbDarken">Darken</label>
+              </div>
+              <label for="cbInvert" class="switch" style="display: flex; flex-direction: row; align-items: center">
+                <input type="checkbox" name="cbOption" id="cbInvert" value="Invert" onchange="onCbOptnChnge(this)" />
+                <span class="track"><span class="thumb"></span></span>
+                <span class="labeltxt">Invert</span>
+              </label>
             </div>
-            <label for="cbInvert" class="switch" style="display: flex; flex-direction: row; align-items: center">
-              <input type="checkbox" name="cbOption" id="cbInvert" value="Invert" onchange="onCbOptnChnge(this)" />
-              <span class="track"><span class="thumb"></span></span>
-              <span class="labeltxt">Invert</span>
-            </label>
+            <div class="slider_container">
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value="40"
+                step="0.4"
+                name="ldSlider"
+                class="slider"
+                id="slider"
+                oninput="onSliderInpChnge(event)"
+              />
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value="40"
+                step="0.4"
+                name="ldSliderValue"
+                class="slider_txt_input"
+                id="sliderInpValue"
+                oninput="onSliderTxtInpChnge(this.value)"
+                onkeyup="onSliderTxtInpKeyPres(event)"
+                onblur="onSliderTxtInpBlur(event)"
+                onkeydown="return validateFloatKeyCode(event)"
+              />
+            </div>
+            <div class="out_color_preview darkmode-ignore"></div>
           </div>
-          <div class="slider_container">
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value="40"
-              step="0.4"
-              name="ldSlider"
-              class="slider"
-              id="slider"
-              oninput="onSliderInpChnge(event)"
-            />
-            <input
-              type="number"
-              min="0"
-              max="100"
-              value="40"
-              step="0.4"
-              name="ldSliderValue"
-              class="slider_txt_input"
-              id="sliderInpValue"
-              oninput="onSliderTxtInpChnge(this.value)"
-              onkeyup="onSliderTxtInpKeyPres(event)"
-              onblur="onSliderTxtInpBlur(event)"
-              onkeydown="return validateFloatKeyCode(event)"
-            />
-          </div>
-          <div class="out_color_preview darkmode-ignore"></div>
-          <div class="input_group">
-            <span class="icon-link">HEX</span>
-            <input class="txtinput" type="text" name="ohexValue" id="txtOutHexColor" readonly />
-            <span
-              id="hexOutToolTip"
-              class="tooltip"
-              aria-label="Copied!"
-              style="margin-left: 20px"
-              onclick="copyText(document.querySelector('#txtOutHexColor').value, 'hexOutToolTip')"
-              >📋</span
-            >
-          </div>
-          <div class="input_group">
-            <span class="icon-link">RGB</span>
-            <input class="txtinput" type="text" name="orgbValue" id="txtOutRgbColor" readonly />
-            <span
-              id="rgbOutToolTip"
-              class="tooltip"
-              aria-label="Copied!"
-              style="margin-left: 20px"
-              onclick="copyText(document.querySelector('#txtOutRgbColor').value, 'rgbOutToolTip')"
-              >📋</span
-            >
-          </div>
-          <div class="input_group">
-            <span class="icon-link">HSL</span>
-            <input class="txtinput" type="text" name="ohslValue" id="txtOutHslColor" readonly />
-            <span
-              id="hslOutToolTip"
-              class="tooltip"
-              aria-label="Copied!"
-              style="margin-left: 20px"
-              onclick="copyText(document.querySelector('#txtOutHslColor').value, 'hslOutToolTip')"
-              >📋</span
-            >
-          </div>
-          <div class="input_group">
-            <span class="icon-link">HSV</span>
-            <input class="txtinput" type="text" name="ohsvValue" id="txtOutHsvColor" readonly />
-            <span
-              id="hsvOutToolTip"
-              class="tooltip"
-              aria-label="Copied!"
-              style="margin-left: 20px"
-              onclick="copyText(document.querySelector('#txtOutHsvColor').value, 'hsvOutToolTip')"
-              >📋</span
-            >
+          <div class="txt_outs">
+            <div class="input_group">
+              <span class="icon-link">HEX</span>
+              <input class="txtinput" type="text" name="ohexValue" id="txtOutHexColor" readonly />
+              <span
+                id="hexOutToolTip"
+                class="tooltip"
+                aria-label="Copied!"
+                onclick="copyText(document.querySelector('#txtOutHexColor').value, 'hexOutToolTip')"
+              >
+                <img src="./img/copy-icon.svg" width="18px" height="18px" alt="copy" />
+              </span>
+            </div>
+            <div class="input_group">
+              <span class="icon-link">RGB</span>
+              <input class="txtinput" type="text" name="orgbValue" id="txtOutRgbColor" readonly />
+              <span
+                id="rgbOutToolTip"
+                class="tooltip"
+                aria-label="Copied!"
+                onclick="copyText(document.querySelector('#txtOutRgbColor').value, 'rgbOutToolTip')"
+              >
+                <img src="./img/copy-icon.svg" width="18px" height="18px" alt="copy" />
+              </span>
+            </div>
+            <div class="input_group">
+              <span class="icon-link">HSL</span>
+              <input class="txtinput" type="text" name="ohslValue" id="txtOutHslColor" readonly />
+              <span
+                id="hslOutToolTip"
+                class="tooltip"
+                aria-label="Copied!"
+                onclick="copyText(document.querySelector('#txtOutHslColor').value, 'hslOutToolTip')"
+              >
+                <img src="./img/copy-icon.svg" width="18px" height="18px" alt="copy" />
+              </span>
+            </div>
+            <div class="input_group">
+              <span class="icon-link">HSV</span>
+              <input class="txtinput" type="text" name="ohsvValue" id="txtOutHsvColor" readonly />
+              <span
+                id="hsvOutToolTip"
+                class="tooltip"
+                aria-label="Copied!"
+                onclick="copyText(document.querySelector('#txtOutHsvColor').value, 'hsvOutToolTip')"
+              >
+                <img src="./img/copy-icon.svg" width="18px" height="18px" alt="copy" />
+              </span>
+            </div>
           </div>
         </div>
       </section>

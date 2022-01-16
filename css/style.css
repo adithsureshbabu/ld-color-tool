@@ -76,7 +76,18 @@ body {
   box-shadow: var(--shadow1);
   -moz-box-shadow: var(--shadow1);
   -webkit-box-shadow: var(--shadow1);
-  -o-box-shadow: var(--shadow1);
+}
+.container > section:nth-child(2) {
+  background: none;
+  padding: 0px;
+  box-shadow: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+}
+.container > section:nth-child(2) > div:nth-child(1) {
+  box-shadow: var(--shadow1);
+  -moz-box-shadow: var(--shadow1);
+  -webkit-box-shadow: var(--shadow1);
 }
 .title {
   font-weight: bolder;
@@ -129,19 +140,32 @@ body {
   -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
-  -webkit-box-pack: space-evenly;
-  -ms-flex-pack: space-evenly;
-  justify-content: space-evenly;
-  background-color: var(--teal0);
-  background-color: var(--teal1_tp);
+  -webkit-box-pack: space-between;
+  -ms-flex-pack: space-between;
+  justify-content: space-between;
   margin: 0 0 0 5px;
-  padding: 10px;
   height: 100%;
   width: 100%;
-  border-radius: 5px;
 }
 .right_part > * {
-  margin: 8px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  height: 100%;
+  margin: 5px 0;
+  padding: 15px 10px;
+  border-radius: 5px;
+  background-color: var(--teal0);
+  background-color: var(--teal1_tp);
+  box-shadow: var(--shadow1);
+  -moz-box-shadow: var(--shadow1);
+  -webkit-box-shadow: var(--shadow1);
+}
+.right_part > *:first-child {
+  margin-top: 0;
+}
+.right_part > *:last-child {
+  margin-bottom: 0;
 }
 .radio_btn_grp {
   display: -webkit-box;
@@ -167,7 +191,6 @@ body {
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
   -webkit-transition: all 0.1s ease-in-out;
-  -o-transition: all 0.1s ease-in-out;
   transition: all 0.1s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -184,10 +207,10 @@ body {
   box-shadow: none;
 }
 .radio_btn_grp label:first-of-type {
-  border-radius: 30px 0 0 30px;
+  border-radius: 10px 0 0 10px;
 }
 .radio_btn_grp label:last-of-type {
-  border-radius: 0 30px 30px 0;
+  border-radius: 0 10px 10px 0;
 }
 label.switch .track {
   width: 40px;
@@ -204,7 +227,6 @@ label.switch .track {
   -webkit-box-shadow: inset 0px 0px 4px -2px rgba(0, 0, 0, 0.129);
   box-shadow: inset 0px 0px 4px -2px rgba(0, 0, 0, 0.129);
   -webkit-transition: 250ms ease;
-  -o-transition: 250ms ease;
   transition: 250ms ease;
 }
 label.switch .thumb {
@@ -220,7 +242,6 @@ label.switch .thumb {
   transform: translateX(4px);
   -webkit-transition: -webkit-transform 250ms ease-in-out;
   transition: -webkit-transform 250ms ease-in-out;
-  -o-transition: transform 250ms ease-in-out;
   transition: transform 250ms ease-in-out;
   transition: transform 250ms ease-in-out, -webkit-transform 250ms ease-in-out;
 }
@@ -276,19 +297,15 @@ label.switch input[type="checkbox"]:focus + .track {
 .slider {
   -webkit-appearance: none;
   width: 100%;
-  height: 15px;
+  height: 18px;
   border: var(--controlborder);
   border-radius: 30px;
   margin: 0 10px 0 0;
-  background: var(--white2);
+  background: linear-gradient(to right, var(--teal2) 0%, var(--teal2) 40%, #fff 40%, white 100%);
   outline: 0;
   opacity: 1;
   -webkit-transition: opacity 0.2s;
-  -o-transition: opacity 0.2s;
   transition: opacity 0.2s;
-}
-.slider:active {
-  background: var(--white);
 }
 .slider:active::-webkit-slider-thumb {
   background: var(--teal3);
@@ -302,14 +319,14 @@ label.switch input[type="checkbox"]:focus + .track {
   width: 25px;
   height: 25px;
   border-radius: 50%;
-  background: var(--teal2);
+  background: var(--teal3);
   cursor: pointer;
 }
 .slider::-moz-range-thumb {
   width: 25px;
   height: 25px;
   border-radius: 50%;
-  background: var(--teal2);
+  background: var(--teal3);
   cursor: pointer;
 }
 .slider_txt_input {
@@ -323,13 +340,35 @@ label.switch input[type="checkbox"]:focus + .track {
 .inp_color_preview,
 .out_color_preview {
   width: 100%;
-  height: 50px;
   background-color: var(--white);
   -webkit-box-shadow: 1px 1px 4px var(--gray);
   box-shadow: 1px 1px 4px var(--gray);
 }
+.inp_color_preview {
+  height: 50px;
+  border-radius: 5px;
+}
 .out_color_preview {
   height: 100px;
+  border-radius: 6px;
+}
+.color_confs > * {
+  margin: 8px 0;
+}
+.color_confs > *:first-child {
+  margin-top: 0px;
+}
+.color_confs > *:last-child {
+  margin-bottom: 0px;
+}
+.txt_outs > * {
+  margin: 8px 0;
+}
+.txt_outs > *:first-child {
+  margin-top: 0px;
+}
+.txt_outs > *:last-child {
+  margin-bottom: 0px;
 }
 .color_picker {
   display: -webkit-box;
@@ -350,8 +389,7 @@ label.switch input[type="checkbox"]:focus + .track {
 }
 .shadow {
   border: 1px solid var(--white2);
-  -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
-    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
 }
 .color_picker_wheel {
@@ -503,12 +541,15 @@ label.switch input[type="checkbox"]:focus + .track {
   min-width: auto;
   border-radius: 0 5px 5px 0;
   border-right: none !important;
-  border-left: var(--controlborder) !important;
-  background: var(--teal0);
+  background: var(--white);
+  cursor: pointer;
 }
 .tooltip {
   position: relative;
   display: inline-block;
+}
+.tooltip > img {
+  margin-right: -4px;
 }
 .tooltip.bottom:before {
   bottom: -7px;
@@ -541,7 +582,6 @@ label.switch input[type="checkbox"]:focus + .track {
   -webkit-clip-path: inset(100%);
   clip-path: inset(100%);
   -webkit-transition: all 0.3s;
-  -o-transition: all 0.3s;
   transition: all 0.3s;
   z-index: 1010;
   left: 50%;
@@ -582,7 +622,6 @@ label.switch input[type="checkbox"]:focus + .track {
   -webkit-clip-path: inset(100%);
   clip-path: inset(100%);
   -webkit-transition: all 0.3s;
-  -o-transition: all 0.3s;
   transition: all 0.3s;
   z-index: 1010;
   left: 50%;
