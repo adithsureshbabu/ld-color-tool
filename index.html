@@ -20,8 +20,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="shortcut icon" type="image/png" sizes="192x192" href="/favicon-192x192.png" />
     <script src="./js/preloader.js"></script>
-    <link rel="preload" href="./fonts/BioRhyme-Regular-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-    <link rel="preload" href="./fonts/BioRhyme-Regular-latin_ext.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./fonts/Sen-Regular-latin_ext.woff" as="font" type="font/woff" crossorigin="anonymous" />
+    <link rel="preload" href="./fonts/Sen-Regular-latin.woff" as="font" type="font/woff" crossorigin="anonymous" />
     <link rel="stylesheet" href="./fonts/fonts.css" />
     <link rel="stylesheet" href="./css/normalize.min.css" />
     <link rel="stylesheet" href="./css/style.css" />
@@ -237,6 +237,21 @@
                 aria-label="Copied!"
                 unselectable="on"
                 onclick="copyText(document.querySelector('#txtOutHsvColor').value, 'hsvOutToolTip')"
+              >
+                <div class="img_overlay_container" unselectable="on">
+                  <img src="./img/copy-icon.svg" width="18px" height="18px" alt="copy" unselectable="on" />
+                </div>
+              </span>
+            </div>
+            <div class="input_group">
+              <span class="icon-link unselectable">ANSI</span>
+              <input class="txtinput" type="text" name="oansiValue" id="txtOutAnsiColor" readonly />
+              <span
+                id="ansiOutToolTip"
+                class="tooltip unselectable"
+                aria-label="Copied!"
+                unselectable="on"
+                onclick="copyText(document.querySelector('#txtOutAnsiColor').value, 'ansiOutToolTip')"
               >
                 <div class="img_overlay_container" unselectable="on">
                   <img src="./img/copy-icon.svg" width="18px" height="18px" alt="copy" unselectable="on" />

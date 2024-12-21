@@ -48,6 +48,17 @@ const cleanHexColr = (value = "") => {
   else if (value.length < 6) return `#${value}${new Array(7).join("9")}`.substr(0, 7).toLowerCase();
 };
 
+const rgbToAnsi = (rgb = { _r: 0, _g: 0, _b: 0 }) => {
+  let { _r, _g, _b } = rgb;
+  let _ar, _ag, _ab;
+  _ar = _ag = _ab = 0;
+  if (_r >= 75) _ar = Math.floor((_r - 35) / 40);
+  if (_g >= 75) _ag = Math.floor((_g - 35) / 40);
+  if (_b >= 75) _ab = Math.floor((_b - 35) / 40);
+  let ansi = _ar * 6 * 6 + _ag * 6 + _ab + 16;
+  return ansi;
+};
+
 const colorOut = (color = defaultColor, amount = defaultAmount, mode = defaultMode) => {
   color = tinycolor(color);
   let { _r, _g, _b } = color;
@@ -83,13 +94,14 @@ const colorOut = (color = defaultColor, amount = defaultAmount, mode = defaultMo
     rgb: color.toRgbString(),
     hsl: color.toHslString(),
     hsv: color.toHsvString(),
+    ansi: rgbToAnsi(color),
   };
 };
 
 const setValues = (color = defaultColor, amount = defaultAmount, mode = defaultMode, invert = defaultInvert) => {
   let invertColor = color;
   if (invert) invertColor = colorOut(color, amount, "invert").hex;
-  let { hex, hsl, hsv, rgb } = colorOut(invertColor, amount, mode);
+  let { hex, hsl, hsv, rgb, ansi } = colorOut(invertColor, amount, mode);
   if (mode.toLowerCase() == "darken") {
     document.querySelector("#rbDarken").checked = true;
     document.querySelector("#rbLighten").checked = false;
@@ -106,6 +118,7 @@ const setValues = (color = defaultColor, amount = defaultAmount, mode = defaultM
   document.querySelector("#txtOutRgbColor").value = rgb;
   document.querySelector("#txtOutHslColor").value = hsl;
   document.querySelector("#txtOutHsvColor").value = hsv;
+  document.querySelector("#txtOutAnsiColor").value = ansi;
   document.querySelector("#rcwColorPicker").setAttribute("hex", color);
   document.querySelector(".inp_color_preview").style.backgroundColor = color;
 };
@@ -138,12 +151,13 @@ const onColrWhelChngeEnd = debounce((el, color) => {
   document.querySelector(".inp_color_preview").style.backgroundColor = color;
   updateUrlQuery(mode, color.replace(/#/g, ""), amount, invert);
   if (invert) color = colorOut(color, amount, "invert").hex;
-  let { hex, hsl, hsv, rgb } = colorOut(color, amount, mode);
+  let { hex, hsl, hsv, rgb, ansi } = colorOut(color, amount, mode);
   document.querySelector(".out_color_preview").style.backgroundColor = rgb;
   document.querySelector("#txtOutHexColor").value = hex;
   document.querySelector("#txtOutRgbColor").value = rgb;
   document.querySelector("#txtOutHslColor").value = hsl;
   document.querySelector("#txtOutHsvColor").value = hsv;
+  document.querySelector("#txtOutAnsiColor").value = ansi;
 });
 
 const onTxtInpColrKeyUp = (event) => {
@@ -246,12 +260,13 @@ const onSliderInpChngeEnd = debounce((value) => {
   let invert = document.querySelector("#cbInvert").checked;
   updateUrlQuery(mode, color.replace(/#/g, ""), amount, invert);
   if (invert) color = colorOut(color, amount, "invert").hex;
-  let { hex, hsl, hsv, rgb } = colorOut(color, amount, mode);
+  let { hex, hsl, hsv, rgb, ansi } = colorOut(color, amount, mode);
   document.querySelector(".out_color_preview").style.backgroundColor = rgb;
   document.querySelector("#txtOutHexColor").value = hex;
   document.querySelector("#txtOutRgbColor").value = rgb;
   document.querySelector("#txtOutHslColor").value = hsl;
   document.querySelector("#txtOutHsvColor").value = hsv;
+  document.querySelector("#txtOutAnsiColor").value = ansi;
 });
 
 const styleSlider = (target) => {
@@ -314,12 +329,13 @@ const onRbOptnChnge = (el) => {
   let invert = document.querySelector("#cbInvert").checked;
   updateUrlQuery(mode, color.replace(/#/g, ""), amount, invert);
   if (invert) color = colorOut(color, amount, "invert").hex;
-  let { hex, hsl, hsv, rgb } = colorOut(color, amount, mode);
+  let { hex, hsl, hsv, rgb, ansi } = colorOut(color, amount, mode);
   document.querySelector(".out_color_preview").style.backgroundColor = rgb;
   document.querySelector("#txtOutHexColor").value = hex;
   document.querySelector("#txtOutRgbColor").value = rgb;
   document.querySelector("#txtOutHslColor").value = hsl;
   document.querySelector("#txtOutHsvColor").value = hsv;
+  document.querySelector("#txtOutAnsiColor").value = ansi;
 };
 
 const onCbOptnChnge = (el) => {
@@ -329,12 +345,13 @@ const onCbOptnChnge = (el) => {
   let invert = el.checked;
   updateUrlQuery(mode, color.replace(/#/g, ""), amount, invert);
   if (invert) color = colorOut(color, amount, "invert").hex;
-  let { hex, hsl, hsv, rgb } = colorOut(color, amount, mode);
+  let { hex, hsl, hsv, rgb, ansi } = colorOut(color, amount, mode);
   document.querySelector(".out_color_preview").style.backgroundColor = rgb;
   document.querySelector("#txtOutHexColor").value = hex;
   document.querySelector("#txtOutRgbColor").value = rgb;
   document.querySelector("#txtOutHslColor").value = hsl;
   document.querySelector("#txtOutHsvColor").value = hsv;
+  document.querySelector("#txtOutAnsiColor").value = ansi;
 };
 
 const copyText = debounce((text, tooltipId) => {
