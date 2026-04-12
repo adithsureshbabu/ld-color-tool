@@ -1,0 +1,379 @@
+/* ============================================
+   App Layout — ld-color-tool specific
+   Depends on: neo-brutalist/brutalist.css
+   ============================================ */
+
+/* ---------- Page ---------- */
+body {
+  background: var(--nb-bg);
+  font-family: var(--nb-font-heading);
+  color: var(--nb-ink);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.page-header {
+  text-align: center;
+  padding: var(--nb-space-xl) var(--nb-space-md) var(--nb-space-md);
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.page-title {
+  font-family: var(--nb-font-heading);
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -1.5px;
+  color: var(--nb-ink);
+  margin: 0 0 var(--nb-space-xs);
+}
+
+.page-description {
+  font-family: var(--nb-font-heading);
+  font-size: 14px;
+  color: var(--nb-ink-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ---------- Bento Grid ---------- */
+.bento {
+  display: grid;
+  grid-template-columns: 280px 1fr 1fr;
+  gap: var(--nb-grid-gap);
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 var(--nb-space-md) var(--nb-space-xl);
+}
+
+.bento-picker {
+  grid-row: span 2;
+}
+
+.bento-adjust {
+  grid-column: span 2;
+}
+
+.bento-outputs {
+  grid-column: span 2;
+}
+
+.bento-harmonies {
+  grid-column: span 2;
+}
+
+.bento-shades {
+  grid-column: span 3;
+}
+
+/* ---------- Card Internals ---------- */
+.picker-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--nb-space-md);
+}
+
+.picker-wheel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--nb-space-sm) 0;
+}
+
+.picker-wheel reinvented-color-wheel {
+  border-radius: 50%;
+}
+
+.picker-inputs {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--nb-space-sm);
+  border-top: var(--nb-border-sm);
+  padding-top: var(--nb-space-md);
+}
+
+.picker-hex-row {
+  display: flex;
+  gap: var(--nb-space-sm);
+}
+
+.picker-hex-row .nb-input {
+  min-width: 0;
+}
+
+.picker-hex-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+  padding: 8px 12px;
+  background: var(--nb-accent-1);
+  border: var(--nb-border-sm);
+  font-family: var(--nb-font-mono);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.picker-rgb-row {
+  display: flex;
+  gap: var(--nb-space-xs);
+}
+
+.picker-rgb-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--nb-space-xs);
+}
+
+.picker-rgb-field label {
+  font-family: var(--nb-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--nb-ink-muted);
+}
+
+.picker-rgb-field .nb-input {
+  width: 100%;
+  min-width: 0;
+}
+
+.adjust-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--nb-space-sm);
+}
+
+.adjust-header .nb-card-label {
+  margin-bottom: 0;
+}
+
+.nb-btn--reset {
+  padding: 6px 8px;
+  min-height: 32px;
+  min-width: 32px;
+  background: var(--nb-surface);
+  border: var(--nb-border-sm);
+}
+
+.nb-btn--reset:hover {
+  background: #f0f0f0;
+}
+
+.adjust-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nb-space-md);
+}
+
+.adjust-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: var(--nb-space-sm);
+}
+
+.slider-row .nb-slider {
+  flex: 1;
+}
+
+.slider-row .nb-input {
+  width: 60px;
+  flex-shrink: 0;
+}
+
+.outputs-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nb-space-sm);
+}
+
+.contrast-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nb-space-md);
+}
+
+.contrast-previews {
+  display: flex;
+  gap: var(--nb-space-sm);
+}
+
+.contrast-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--nb-space-md);
+  border: var(--nb-border-sm);
+  font-family: var(--nb-font-heading);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.contrast-ratio {
+  text-align: center;
+  font-family: var(--nb-font-mono);
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.contrast-badges {
+  display: flex;
+  gap: var(--nb-space-sm);
+}
+
+.contrast-badges .nb-badge {
+  flex: 1;
+  text-align: center;
+  justify-content: center;
+}
+
+.contrast-bg-row {
+  display: flex;
+  align-items: center;
+  gap: var(--nb-space-sm);
+}
+
+.contrast-bg-row label {
+  font-family: var(--nb-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--nb-ink-muted);
+  white-space: nowrap;
+}
+
+.contrast-bg-row .nb-input {
+  flex: 1;
+}
+
+.harmonies-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nb-space-md);
+}
+
+.harmony-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nb-space-xs);
+}
+
+.harmony-type {
+  font-family: var(--nb-font-heading);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--nb-ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.harmony-swatches {
+  display: flex;
+  gap: var(--nb-space-xs);
+}
+
+.harmony-swatches .nb-swatch {
+  flex: 1;
+  height: 40px;
+}
+
+.shades-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nb-space-md);
+}
+
+/* ---------- Responsive: Tablet ---------- */
+@media (max-width: 959px) {
+  .bento {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .bento-picker {
+    grid-column: span 2;
+    grid-row: span 1;
+  }
+
+  .bento-adjust {
+    grid-column: span 1;
+  }
+
+  .bento-outputs {
+    grid-column: span 1;
+  }
+
+  .bento-contrast {
+    grid-column: span 1;
+  }
+
+  .bento-harmonies {
+    grid-column: span 1;
+  }
+
+  .bento-shades {
+    grid-column: span 2;
+  }
+
+  .picker-layout {
+    flex-direction: row;
+    gap: var(--nb-space-lg);
+  }
+
+  .picker-wheel {
+    flex-shrink: 0;
+  }
+
+  .picker-inputs {
+    border-top: none;
+    border-left: var(--nb-border-sm);
+    padding-top: 0;
+    padding-left: var(--nb-space-lg);
+  }
+}
+
+/* ---------- Responsive: Mobile ---------- */
+@media (max-width: 767px) {
+  .bento {
+    grid-template-columns: 1fr;
+  }
+
+  .bento-picker,
+  .bento-adjust,
+  .bento-outputs,
+  .bento-contrast,
+  .bento-harmonies,
+  .bento-shades {
+    grid-column: span 1;
+    grid-row: span 1;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .picker-layout {
+    flex-direction: column;
+  }
+
+  .picker-inputs {
+    border-left: none;
+    border-top: var(--nb-border-sm);
+    padding-left: 0;
+    padding-top: var(--nb-space-md);
+  }
+
+  .contrast-ratio {
+    font-size: 22px;
+  }
+}

@@ -1,0 +1,22 @@
+/* ============================================
+   Neo-Brutalist Icon Helpers
+   Requires Phosphor Icons CDN in <head>:
+   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+   ============================================ */
+
+.nb-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+  color: inherit;
+}
+
+.nb-icon--sm {
+  font-size: 14px;
+}
+
+.nb-icon--lg {
+  font-size: 24px;
+}

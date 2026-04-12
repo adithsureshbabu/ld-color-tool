@@ -1,289 +1,336 @@
-<!DOCTYPE html>
-<html lang="en" class="default-theme">
+<!doctype html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lighten/Darken Color Tool</title>
     <meta
-      name="keywords"
-      content="lighten color, brighten color, darken color, increase color brightness, increase color darkness, increase color lightness, decrease color brightness, decrease color darkness, decrease color lightness, color modify, darken, lighten, brighten, darkness, lightness, brightness, white, black, color, invert color, opposite color"
+      name="description"
+      content="Lighten, darken, or invert any color. View contrast ratios, shade scales, and color harmonies. Enter color in HEX, RGB, HSL, or HSV."
     />
     <meta
-      name="description"
-      content="Lighten/Darken, Invert, any color upto specific amount using the color tool. Enter color in hex or rgb and get different lighter/darker shades of the color."
+      name="keywords"
+      content="lighten color, darken color, color tool, contrast checker, shade scale, color harmonies, hex, rgb, hsl"
     />
     <meta name="robots" content="index, follow" />
+    <meta name="google-site-verification" content="GPi_D3UDEKXv_MPlNp7bxL7uLJhkunhqy4Rc7f87Kdg" />
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GJCHG84XCY"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-GJCHG84XCY");
+    </script>
+
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <link rel="shortcut icon" type="image/png" sizes="192x192" href="/favicon-192x192.png" />
-    <script src="./js/preloader.js"></script>
-    <link rel="preload" href="./fonts/Sen-Regular-latin_ext.woff" as="font" type="font/woff" crossorigin="anonymous" />
-    <link rel="preload" href="./fonts/Sen-Regular-latin.woff" as="font" type="font/woff" crossorigin="anonymous" />
-    <link rel="stylesheet" href="./fonts/fonts.css" />
-    <link rel="stylesheet" href="./css/normalize.min.css" />
-    <link rel="stylesheet" href="./css/style.css" />
-    <script src="./js/tinycolor.min.js"></script>
-    <script src="./js/app.js"></script>
-    <script src="./js/reinvented-color-wheel-wc.js"></script>
-    <script>
-      var ga = document.createElement("script");
-      ga.async = true;
-      ga.src = "https://www.googletagmanager.com/gtag/js?id=G-GJCHG84XCY";
-      document.head.appendChild(ga);
-      window.dataLayer = window.dataLayer || [];
-      window.gtag = function () {
-        window.dataLayer.push(arguments);
-      };
-      window.gtag("js", new Date());
-      window.gtag("config", "G-GJCHG84XCY");
-    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+    <link rel="stylesheet" href="./css/sanitize.css" />
+    <link rel="stylesheet" href="./neo-brutalist/brutalist.css" />
+    <link rel="stylesheet" href="./neo-brutalist/brutalist-icons.css" />
+    <link rel="stylesheet" href="./css/app.css" />
   </head>
   <body>
-    <div class="loader" oncontextmenu="return false;">
-      <div class="loader_ellipsis">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
+    <div class="nb-loader" id="nb-loader">
+      <div class="nb-loader-blocks">
+        <div class="nb-loader-block"></div>
+        <div class="nb-loader-block"></div>
+        <div class="nb-loader-block"></div>
+        <div class="nb-loader-block"></div>
       </div>
     </div>
-    <div class="blurred_full_bg"></div>
-    <div class="container">
-      <section class="part_0">
-        <p class="title">Lighten / Darken Color Tool</p>
-        <p class="description">
-          Lighten/Darken any color upto specific amount using the color tool. Enter color in rgb, hex, hsl or hsv and get
-          different lighter/darker shades of the color.
-        </p>
-      </section>
-      <section class="part_1 row">
-        <div class="left_part">
-          <div class="color_picker">
-            <div class="color_picker_wheel">
-              <reinvented-color-wheel
-                id="rcwColorPicker"
-                hex="#0099dc"
-                wheel-diameter="200"
-                wheel-thickness="20"
-                handle-diameter="16"
-                wheel-reflects-saturation="false"
-                onchange="onColrWhlChnge(this)"
-              ></reinvented-color-wheel>
+
+    <header class="page-header">
+      <h1 class="page-title">Lighten / Darken Color Tool</h1>
+      <p class="page-description">
+        Lighten, darken, or invert any color up to a specific amount. Enter color in HEX, RGB, HSL, or HSV and explore
+        shades, harmonies, and contrast ratios.
+      </p>
+    </header>
+
+    <main class="bento">
+      <!-- Color Picker -->
+      <section class="nb-card bento-picker" aria-label="Color picker">
+        <div class="nb-card-label">Pick a color</div>
+        <div class="picker-layout">
+          <div class="picker-wheel">
+            <reinvented-color-wheel
+              id="colorWheel"
+              hex="#0099dd"
+              wheel-diameter="180"
+              wheel-thickness="20"
+              handle-diameter="16"
+              wheel-reflects-saturation="false"
+            ></reinvented-color-wheel>
+          </div>
+          <div class="nb-color-preview nb-color-preview--sm" id="inputPreview"></div>
+          <div class="picker-inputs">
+            <div class="picker-hex-row">
+              <span class="picker-hex-label">HEX</span>
+              <input
+                type="text"
+                class="nb-input"
+                id="hexInput"
+                maxlength="7"
+                data-action="hex-input"
+                title="Enter hex color (e.g. #FF6B6B)"
+                style="flex: 1"
+              />
             </div>
-            <div class="color_inputs">
-              <div class="inp_color_preview darkmode-ignore"></div>
-              <div class="color_input">
-                <label for="txtInpHexColor" class="unselectable">HEX</label>
+            <div class="picker-rgb-row">
+              <div class="picker-rgb-field">
+                <label for="rInput">R</label>
                 <input
-                  type="text"
-                  name="ihexValue"
-                  maxlength="7"
-                  id="txtInpHexColor"
-                  oninput="onTxtInpColrChnge('hex', this.value)"
-                  onkeydown="return validateColorKeyCode(event)"
-                  onkeyup="onTxtInpColrKeyUp(event)"
-                  onblur="onTxtInpColrBlur(event,'hex')"
+                  type="number"
+                  class="nb-input"
+                  id="rInput"
+                  min="0"
+                  max="255"
+                  data-action="rgb-input"
+                  data-channel="r"
+                  title="Red channel (0–255)"
                 />
               </div>
-              <div class="color_input_group">
-                <div class="color_input">
-                  <label for="txtInpRColor" class="unselectable">R</label>
-                  <input
-                    class="color_input tri_color_input"
-                    type="number"
-                    min="0"
-                    max="255"
-                    pattern="\d*"
-                    name="irValue"
-                    id="txtInpRColor"
-                    oninput="onTxtInpColrChnge('r', this.value)"
-                    onkeydown="return validateIntegerKeyCode(event)"
-                    onblur="onTxtInpColrRgbBlur(event,'r')"
-                  />
-                </div>
-                <div class="color_input">
-                  <label for="txtInpGColor" class="unselectable">G</label>
-                  <input
-                    class="color_input tri_color_input"
-                    type="number"
-                    min="0"
-                    max="255"
-                    pattern="\d*"
-                    name="igValue"
-                    id="txtInpGColor"
-                    oninput="onTxtInpColrChnge('g', this.value)"
-                    onkeydown="return validateIntegerKeyCode(event)"
-                    onblur="onTxtInpColrRgbBlur(event,'g')"
-                  />
-                </div>
-                <div class="color_input">
-                  <label for="txtInpBColor" class="unselectable">B</label>
-                  <input
-                    class="color_input tri_color_input"
-                    type="number"
-                    min="0"
-                    max="255"
-                    pattern="\d*"
-                    name="ibValue"
-                    id="txtInpBColor"
-                    oninput="onTxtInpColrChnge('b', this.value)"
-                    onkeydown="return validateIntegerKeyCode(event)"
-                    onblur="onTxtInpColrRgbBlur(event,'b')"
-                  />
-                </div>
+              <div class="picker-rgb-field">
+                <label for="gInput">G</label>
+                <input
+                  type="number"
+                  class="nb-input"
+                  id="gInput"
+                  min="0"
+                  max="255"
+                  data-action="rgb-input"
+                  data-channel="g"
+                  title="Green channel (0–255)"
+                />
               </div>
-            </div>
-          </div>
-        </div>
-        <div class="right_part">
-          <div class="color_confs">
-            <div class="check_btn_grp">
-              <div class="radio_btn_grp">
-                <input type="radio" id="rbLighten" name="rbLDOption" value="Lighten" onchange="onRbOptnChnge(this)" />
-                <label for="rbLighten" class="unselectable">Lighten</label>
-                <input type="radio" id="rbDarken" name="rbLDOption" value="Darken" onchange="onRbOptnChnge(this)" />
-                <label for="rbDarken" class="unselectable">Darken</label>
+              <div class="picker-rgb-field">
+                <label for="bInput">B</label>
+                <input
+                  type="number"
+                  class="nb-input"
+                  id="bInput"
+                  min="0"
+                  max="255"
+                  data-action="rgb-input"
+                  data-channel="b"
+                  title="Blue channel (0–255)"
+                />
               </div>
-              <label for="cbInvert" class="switch" style="display: flex; flex-direction: row; align-items: center">
-                <input type="checkbox" name="cbOption" id="cbInvert" value="Invert" onchange="onCbOptnChnge(this)" />
-                <span class="track"><span class="thumb"></span></span>
-                <span class="labeltxt unselectable">Invert</span>
-              </label>
-            </div>
-            <div class="slider_container">
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value="40"
-                step="0.4"
-                name="ldSlider"
-                class="slider"
-                id="slider"
-                oninput="onSliderInpChnge(event)"
-              />
-              <input
-                type="number"
-                min="0"
-                max="100"
-                value="40"
-                step="0.4"
-                name="ldSliderValue"
-                class="slider_txt_input"
-                id="sliderInpValue"
-                oninput="onSliderTxtInpChnge(this.value)"
-                onkeyup="onSliderTxtInpKeyPres(event)"
-                onblur="onSliderTxtInpBlur(event)"
-                onkeydown="return validateFloatKeyCode(event)"
-              />
-            </div>
-            <div class="out_color_preview darkmode-ignore"></div>
-          </div>
-          <div class="txt_outs">
-            <div class="input_group">
-              <span class="icon-link unselectable">HEX</span>
-              <input class="txtinput" type="text" name="ohexValue" id="txtOutHexColor" readonly />
-              <span
-                id="hexOutToolTip"
-                class="tooltip unselectable"
-                aria-label="Copied!"
-                unselectable="on"
-                onclick="copyText(document.querySelector('#txtOutHexColor').value, 'hexOutToolTip')"
-              >
-                <div class="img_overlay_container" unselectable="on">
-                  <img src="./img/copy-icon.svg" width="18px" height="18px" alt="copy" unselectable="on" />
-                </div>
-              </span>
-            </div>
-            <div class="input_group">
-              <span class="icon-link unselectable">RGB</span>
-              <input class="txtinput" type="text" name="orgbValue" id="txtOutRgbColor" readonly />
-              <span
-                id="rgbOutToolTip"
-                class="tooltip unselectable"
-                aria-label="Copied!"
-                unselectable="on"
-                onclick="copyText(document.querySelector('#txtOutRgbColor').value, 'rgbOutToolTip')"
-              >
-                <div class="img_overlay_container" unselectable="on">
-                  <img src="./img/copy-icon.svg" width="18px" height="18px" alt="copy" unselectable="on" />
-                </div>
-              </span>
-            </div>
-            <div class="input_group">
-              <span class="icon-link unselectable">HSL</span>
-              <input class="txtinput" type="text" name="ohslValue" id="txtOutHslColor" readonly />
-              <span
-                id="hslOutToolTip"
-                class="tooltip unselectable"
-                aria-label="Copied!"
-                unselectable="on"
-                onclick="copyText(document.querySelector('#txtOutHslColor').value, 'hslOutToolTip')"
-              >
-                <div class="img_overlay_container" unselectable="on">
-                  <img src="./img/copy-icon.svg" width="18px" height="18px" alt="copy" unselectable="on" />
-                </div>
-              </span>
-            </div>
-            <div class="input_group">
-              <span class="icon-link unselectable">HSV</span>
-              <input class="txtinput" type="text" name="ohsvValue" id="txtOutHsvColor" readonly />
-              <span
-                id="hsvOutToolTip"
-                class="tooltip unselectable"
-                aria-label="Copied!"
-                unselectable="on"
-                onclick="copyText(document.querySelector('#txtOutHsvColor').value, 'hsvOutToolTip')"
-              >
-                <div class="img_overlay_container" unselectable="on">
-                  <img src="./img/copy-icon.svg" width="18px" height="18px" alt="copy" unselectable="on" />
-                </div>
-              </span>
-            </div>
-            <div class="input_group">
-              <span class="icon-link unselectable">ANSI</span>
-              <input class="txtinput" type="text" name="oansiValue" id="txtOutAnsiColor" readonly />
-              <span
-                id="ansiOutToolTip"
-                class="tooltip unselectable"
-                aria-label="Copied!"
-                unselectable="on"
-                onclick="copyText(document.querySelector('#txtOutAnsiColor').value, 'ansiOutToolTip')"
-              >
-                <div class="img_overlay_container" unselectable="on">
-                  <img src="./img/copy-icon.svg" width="18px" height="18px" alt="copy" unselectable="on" />
-                </div>
-              </span>
             </div>
           </div>
         </div>
       </section>
-    </div>
+
+      <!-- Adjust Controls -->
+      <section class="nb-card bento-adjust" aria-label="Adjust lightness">
+        <div class="adjust-header">
+          <div class="nb-card-label">Adjust</div>
+          <button
+            class="nb-btn nb-btn--reset"
+            data-action="reset"
+            aria-label="Reset adjustments"
+            title="Reset adjustments"
+          >
+            <i class="ph ph-arrow-counter-clockwise nb-icon"></i>
+          </button>
+        </div>
+        <div class="adjust-layout">
+          <div class="adjust-controls">
+            <div class="nb-toggle-group" role="radiogroup" aria-label="Lighten or darken">
+              <button
+                class="nb-btn nb-btn--active"
+                role="radio"
+                aria-checked="true"
+                data-action="set-mode"
+                data-mode="lighten"
+                title="Lighten the color"
+              >
+                Lighten
+              </button>
+              <button
+                class="nb-btn"
+                role="radio"
+                aria-checked="false"
+                data-action="set-mode"
+                data-mode="darken"
+                title="Darken the color"
+              >
+                Darken
+              </button>
+            </div>
+            <label class="nb-checkbox">
+              <input
+                type="checkbox"
+                id="invertCheckbox"
+                data-action="toggle-invert"
+                title="Invert the color before adjusting"
+              />
+              Invert
+            </label>
+          </div>
+          <div class="slider-row">
+            <input
+              type="range"
+              class="nb-slider"
+              id="amountSlider"
+              min="0"
+              max="100"
+              value="40"
+              step="0.4"
+              data-action="slider-input"
+              title="Adjustment amount (0–100%)"
+            />
+            <input
+              type="number"
+              class="nb-input"
+              id="amountInput"
+              min="0"
+              max="100"
+              value="40"
+              step="0.4"
+              data-action="amount-input"
+              title="Adjustment amount (0–100%)"
+            />
+          </div>
+          <div class="nb-color-preview nb-color-preview--lg" id="outputPreview"></div>
+        </div>
+      </section>
+
+      <!-- Output Values -->
+      <section class="nb-card bento-outputs" aria-label="Output color values" aria-live="polite">
+        <div class="nb-card-label">Output values</div>
+        <div class="outputs-layout">
+          <div class="nb-output-row">
+            <span class="nb-output-row__label">HEX</span>
+            <span class="nb-output-row__value" id="outHex"></span>
+            <button
+              class="nb-output-row__copy nb-tooltip"
+              data-tooltip="Copied!"
+              data-action="copy"
+              data-target="outHex"
+              aria-label="Copy HEX value"
+              title="Copy HEX value"
+            >
+              <i class="ph ph-copy nb-icon"></i>
+            </button>
+          </div>
+          <div class="nb-output-row">
+            <span class="nb-output-row__label">RGB</span>
+            <span class="nb-output-row__value" id="outRgb"></span>
+            <button
+              class="nb-output-row__copy nb-tooltip"
+              data-tooltip="Copied!"
+              data-action="copy"
+              data-target="outRgb"
+              aria-label="Copy RGB value"
+              title="Copy RGB value"
+            >
+              <i class="ph ph-copy nb-icon"></i>
+            </button>
+          </div>
+          <div class="nb-output-row">
+            <span class="nb-output-row__label">HSL</span>
+            <span class="nb-output-row__value" id="outHsl"></span>
+            <button
+              class="nb-output-row__copy nb-tooltip"
+              data-tooltip="Copied!"
+              data-action="copy"
+              data-target="outHsl"
+              aria-label="Copy HSL value"
+              title="Copy HSL value"
+            >
+              <i class="ph ph-copy nb-icon"></i>
+            </button>
+          </div>
+          <div class="nb-output-row">
+            <span class="nb-output-row__label">HSV</span>
+            <span class="nb-output-row__value" id="outHsv"></span>
+            <button
+              class="nb-output-row__copy nb-tooltip"
+              data-tooltip="Copied!"
+              data-action="copy"
+              data-target="outHsv"
+              aria-label="Copy HSV value"
+              title="Copy HSV value"
+            >
+              <i class="ph ph-copy nb-icon"></i>
+            </button>
+          </div>
+          <div class="nb-output-row">
+            <span class="nb-output-row__label">ANSI</span>
+            <span class="nb-output-row__value" id="outAnsi"></span>
+            <button
+              class="nb-output-row__copy nb-tooltip"
+              data-tooltip="Copied!"
+              data-action="copy"
+              data-target="outAnsi"
+              aria-label="Copy ANSI value"
+              title="Copy ANSI value"
+            >
+              <i class="ph ph-copy nb-icon"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contrast Checker -->
+      <section class="nb-card bento-contrast" aria-label="Contrast checker">
+        <div class="nb-card-label" style="color: var(--nb-accent-2)">Contrast checker</div>
+        <div class="contrast-layout">
+          <div class="contrast-bg-row">
+            <label for="contrastBgInput">BG</label>
+            <input
+              type="text"
+              class="nb-input"
+              id="contrastBgInput"
+              value="#FFFFFF"
+              maxlength="7"
+              data-action="contrast-bg-input"
+              title="Background color for contrast check"
+            />
+          </div>
+          <div class="contrast-previews">
+            <div class="contrast-box" id="contrastBoxA"><span>Text Aa</span></div>
+            <div class="contrast-box" id="contrastBoxB"><span>Text Aa</span></div>
+          </div>
+          <div class="contrast-ratio" id="contrastRatio">—</div>
+          <div class="contrast-badges">
+            <span class="nb-badge" id="badgeAA">AA</span>
+            <span class="nb-badge" id="badgeAALarge">AA+</span>
+            <span class="nb-badge" id="badgeAAA">AAA</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Color Harmonies -->
+      <section class="nb-card bento-harmonies" aria-label="Color harmonies">
+        <div class="nb-card-label" style="color: var(--nb-accent-4)">Color harmonies</div>
+        <div class="harmonies-layout" id="harmoniesContainer"></div>
+      </section>
+
+      <!-- Shade Scale -->
+      <section class="nb-card bento-shades" aria-label="Shade scale">
+        <div class="nb-card-label" style="color: var(--nb-accent-3)">Shade scale</div>
+        <div class="shades-layout">
+          <div class="nb-shade-strip" id="shadeStrip"></div>
+        </div>
+      </section>
+    </main>
+
+    <script src="./js/tinycolor-min.js"></script>
+    <script src="./js/reinvented-color-wheel-wc.js"></script>
+    <script type="module" src="./js/app.js"></script>
   </body>
-  <!-- <script>
-    let dmScript = document.createElement("script");
-    dmScript.src = "https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js";
-    document.head.appendChild(dmScript);
-    let dmStylesheet = `.darkmode-toggle { z-index: 999; }`;
-    //uncomment below line if darkmode doesnot work for some elements
-    // dmStylesheet+=`.darkmode-layer { z-index: 999; }`
-    let dmStyle = document.createElement("style");
-    dmStyle.innerText = dmStylesheet;
-    document.head.appendChild(dmStyle);
-    const addDarkmodeWidget = () => {
-      window.darkmode = new Darkmode({ label: "🌓" });
-      window.darkmode.showWidget();
-      let dmBg = document.querySelector(".darkmode-background");
-      if (dmBg) dmBg.remove();
-      return;
-    };
-    let stateCheck = setInterval(() => {
-      if (document.readyState !== "complete") return;
-      clearInterval(stateCheck);
-      addDarkmodeWidget();
-    }, 100);
-  </script> -->
 </html>

@@ -1,0 +1,508 @@
+/* ============================================
+   Neo-Brutalist Design System — brutalist.css
+   Portable: copy this folder into any project.
+   Prefix: nb- (neo-brutalist)
+   ============================================ */
+
+/* ---------- Tokens ---------- */
+:root {
+  /* Colors */
+  --nb-bg: #FEF3E2;
+  --nb-surface: #FFFFFF;
+  --nb-ink: #222222;
+  --nb-ink-muted: #555555;
+  --nb-accent-1: #FF6B6B;
+  --nb-accent-2: #4ECDC4;
+  --nb-accent-3: #F4C506;
+  --nb-accent-4: #C3B1E1;
+
+  /* Borders & Shadows */
+  --nb-border: 3px solid var(--nb-ink);
+  --nb-border-sm: 2px solid var(--nb-ink);
+  --nb-shadow: 5px 5px 0 var(--nb-ink);
+  --nb-shadow-sm: 3px 3px 0 var(--nb-ink);
+  --nb-radius: 0px;
+
+  /* Typography */
+  --nb-font-heading: 'Space Grotesk', system-ui, sans-serif;
+  --nb-font-mono: 'JetBrains Mono', monospace;
+
+  /* Spacing */
+  --nb-space-xs: 4px;
+  --nb-space-sm: 8px;
+  --nb-space-md: 16px;
+  --nb-space-lg: 24px;
+  --nb-space-xl: 32px;
+  --nb-grid-gap: 12px;
+}
+
+/* ---------- Base Reset (scoped to nb- usage) ---------- */
+.nb-card,
+.nb-card * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border-radius: var(--nb-radius);
+}
+
+/* ---------- Card ---------- */
+.nb-card {
+  background: var(--nb-surface);
+  border: var(--nb-border);
+  box-shadow: var(--nb-shadow);
+  padding: var(--nb-space-lg);
+  font-family: var(--nb-font-heading);
+  color: var(--nb-ink);
+  position: relative;
+  overflow: hidden;
+}
+
+.nb-card-label {
+  font-family: var(--nb-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--nb-ink-muted);
+  margin-bottom: var(--nb-space-sm);
+}
+
+/* ---------- Button ---------- */
+.nb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  font-family: var(--nb-font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--nb-ink-muted);
+  background: var(--nb-surface);
+  border: var(--nb-border-sm);
+  cursor: pointer;
+  min-height: 44px;
+  min-width: 44px;
+  transition: none;
+}
+
+.nb-btn:hover {
+  background: #f0f0f0;
+}
+
+.nb-btn--active {
+  color: var(--nb-ink);
+  background: var(--nb-accent-1);
+  box-shadow: var(--nb-shadow-sm);
+}
+
+.nb-btn--active:hover {
+  background: var(--nb-accent-1);
+}
+
+/* ---------- Toggle Group ---------- */
+.nb-toggle-group {
+  display: inline-flex;
+}
+
+.nb-toggle-group .nb-btn:not(:first-child) {
+  margin-left: -2px;
+}
+
+/* ---------- Checkbox (brutalist) ---------- */
+.nb-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nb-space-sm);
+  cursor: pointer;
+  font-family: var(--nb-font-heading);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--nb-ink);
+  min-height: 44px;
+}
+
+.nb-checkbox input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border: var(--nb-border-sm);
+  background: var(--nb-surface);
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.nb-checkbox input[type="checkbox"]:checked {
+  background: var(--nb-accent-4);
+}
+
+.nb-checkbox input[type="checkbox"]:checked::after {
+  content: "\2713";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--nb-ink);
+}
+
+/* ---------- Input ---------- */
+.nb-input {
+  border: var(--nb-border-sm);
+  padding: 8px 12px;
+  font-family: var(--nb-font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  color: var(--nb-ink);
+  background: var(--nb-surface);
+  min-height: 44px;
+}
+
+.nb-input:focus {
+  outline: 3px solid var(--nb-ink);
+  outline-offset: 2px;
+}
+
+.nb-input::placeholder {
+  color: var(--nb-ink-muted);
+}
+
+/* ---------- Output Row ---------- */
+.nb-output-row {
+  display: flex;
+  align-items: stretch;
+  border: var(--nb-border-sm);
+  min-height: 44px;
+}
+
+.nb-output-row__label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  padding: 8px 12px;
+  font-family: var(--nb-font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--nb-accent-1);
+  color: var(--nb-ink);
+  border-right: var(--nb-border-sm);
+}
+
+.nb-output-row__value {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  font-family: var(--nb-font-mono);
+  font-size: 13px;
+  color: var(--nb-ink);
+  background: var(--nb-surface);
+}
+
+.nb-output-row__copy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: none;
+  border-left: var(--nb-border-sm);
+  background: var(--nb-surface);
+  cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--nb-ink);
+  font-size: 18px;
+}
+
+.nb-output-row__copy:hover {
+  background: #f0f0f0;
+}
+
+.nb-output-row__copy--flash {
+  background: var(--nb-accent-2);
+  transition: background 200ms;
+}
+
+/* ---------- Badge ---------- */
+.nb-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border: var(--nb-border-sm);
+  font-family: var(--nb-font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  min-height: 32px;
+}
+
+.nb-badge--pass {
+  background: #C8F7C5;
+  color: var(--nb-ink);
+}
+
+.nb-badge--fail {
+  background: #FFB4B4;
+  color: var(--nb-ink);
+}
+
+/* ---------- Tooltip ---------- */
+.nb-tooltip {
+  position: relative;
+}
+
+.nb-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 10px;
+  background: var(--nb-ink);
+  color: var(--nb-surface);
+  font-family: var(--nb-font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms;
+  z-index: 100;
+}
+
+.nb-tooltip--visible::after {
+  opacity: 1;
+}
+
+/* ---------- Swatch ---------- */
+.nb-swatch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: var(--nb-border-sm);
+  min-width: 44px;
+  min-height: 44px;
+  cursor: pointer;
+  position: relative;
+  font-family: var(--nb-font-mono);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.nb-swatch__hex {
+  opacity: 0;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-family: var(--nb-font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  transition: opacity 150ms;
+}
+
+.nb-swatch:hover .nb-swatch__hex {
+  opacity: 1;
+}
+
+/* ---------- Shade Strip ---------- */
+.nb-shade-strip {
+  display: flex;
+  border: var(--nb-border);
+  overflow: hidden;
+}
+
+.nb-shade-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--nb-space-xs);
+  padding: 12px 4px;
+  font-family: var(--nb-font-mono);
+  cursor: pointer;
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  min-height: 56px;
+  transition: transform 100ms;
+}
+
+.nb-shade-step:last-child {
+  border-right: none;
+}
+
+.nb-shade-step:hover {
+  transform: translateY(-2px);
+}
+
+.nb-shade-step__num {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.nb-shade-step__hex {
+  font-size: 9px;
+  opacity: 0.8;
+}
+
+/* ---------- Slider ---------- */
+.nb-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 16px;
+  border: var(--nb-border-sm);
+  background: linear-gradient(to right, var(--nb-accent-1) 40%, var(--nb-surface) 40%);
+  outline: none;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.nb-slider:focus {
+  outline: 3px solid var(--nb-ink);
+  outline-offset: 2px;
+}
+
+.nb-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 26px;
+  height: 26px;
+  background: var(--nb-ink);
+  border: 3px solid var(--nb-surface);
+  cursor: pointer;
+}
+
+.nb-slider::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+  background: var(--nb-ink);
+  border: 3px solid var(--nb-surface);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+/* ---------- Color Preview ---------- */
+.nb-color-preview {
+  width: 100%;
+  border: var(--nb-border-sm);
+}
+
+.nb-color-preview--sm {
+  height: 48px;
+}
+
+.nb-color-preview--lg {
+  height: 64px;
+  border: var(--nb-border);
+  box-shadow: var(--nb-shadow-sm);
+}
+
+/* ---------- Accessibility ---------- */
+*:focus-visible {
+  outline: 3px solid var(--nb-ink);
+  outline-offset: 2px;
+}
+
+/* ---------- Reduced Motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+
+  .nb-tooltip::after,
+  .nb-shade-step,
+  .nb-output-row__copy--flash,
+  .nb-swatch__hex {
+    transition: none;
+  }
+
+  .nb-shade-step:hover {
+    transform: none;
+  }
+}
+
+/* ---------- Loader ---------- */
+.nb-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--nb-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: var(--nb-space-md);
+  transition: opacity 300ms ease-out;
+}
+
+.nb-loader[hidden] {
+  display: flex;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.nb-loader-blocks {
+  display: flex;
+  gap: 6px;
+}
+
+.nb-loader-block {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--nb-ink);
+  animation: nb-loader-pulse 600ms ease-in-out infinite alternate;
+}
+
+.nb-loader-block:nth-child(1) {
+  background: var(--nb-accent-1);
+  animation-delay: 0ms;
+}
+
+.nb-loader-block:nth-child(2) {
+  background: var(--nb-accent-2);
+  animation-delay: 150ms;
+}
+
+.nb-loader-block:nth-child(3) {
+  background: var(--nb-accent-3);
+  animation-delay: 300ms;
+}
+
+.nb-loader-block:nth-child(4) {
+  background: var(--nb-accent-4);
+  animation-delay: 450ms;
+}
+
+.nb-loader-text {
+  font-family: var(--nb-font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--nb-ink-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+@keyframes nb-loader-pulse {
+  0% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scaleY(2);
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nb-loader-block {
+    animation: none;
+  }
+}
