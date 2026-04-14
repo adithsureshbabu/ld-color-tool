@@ -268,16 +268,23 @@ Full-page loading overlay with animated blocks in the four accent colors. Covers
 **Dismiss with JS** :
 
 ```javascript
-var loader = document.getElementById("nb-loader");
+const dismissLoader = () => {
+  const loader = document.getElementById("nb-loader");
 
-if (loader) {
-  // After your app is ready:
-  loader.setAttribute("hidden", "");
+  if (loader) {
+    // After the app is ready:
+    loader.hidden = true;
 
-  // Optional: remove from DOM after fade-out
-  setTimeout(function () {
-    loader.remove();
-  }, 300);
+    // Optional: remove from DOM after fade-out
+    setTimeout(() => loader.remove(), 500);
+  }
+};
+
+if (document.readyState === "complete") {
+  // Dismiss loader after all resources (fonts, icons CDN) have loaded
+  dismissLoader();
+} else {
+  window.addEventListener("load", dismissLoader, { once: true });
 }
 ```
 

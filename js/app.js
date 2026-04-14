@@ -1,6 +1,22 @@
 /* ============================================
    app.js — Lighten/Darken Color Tool
-   State-driven rendering, event delegation
+
+   Architecture: single state object drives all UI.
+   Every user action calls setState() which triggers
+   render() (updates DOM) and syncToUrl() (updates URL).
+
+   Sections:
+     STATE       → state object, defaults, setState
+     URL SYNC    → read/write URL query parameters
+     COLOR MATH  → pure functions, no DOM access
+     DOM HELPERS → shorthand for getElementById, createElement
+     RENDER      → updates each bento card from state
+     CLIPBOARD   → copy-to-clipboard + tooltip feedback
+     COLOR WHEEL → integration with <reinvented-color-wheel>
+     HEX INPUT   → shared validation for hex color fields
+     EVENTS      → delegated click, input, focusout on .bento
+     JSON API    → ?format=json renders raw JSON output
+     INIT        → entry point, boots the app or JSON mode
    ============================================ */
 
 // ==================== STATE ====================
@@ -10,11 +26,12 @@ const DEFAULTS = Object.freeze({
   mode: "lighten",
   amount: 40,
   invert: false,
-  contrastBg: "#FFFFFF"
+  contrastBg: "#ffffff"
 });
 
 const state = { ...DEFAULTS };
 
+/** Merge updates into state, re-render UI, and sync URL. */
 const setState = updates => {
   Object.assign(state, updates);
   render();
@@ -23,10 +40,11 @@ const setState = updates => {
 
 // ==================== URL SYNC ====================
 
+/** Parse URL query params (?mode, color, amount, invert) into state. */
 const readFromUrl = () => {
   const params = new URLSearchParams(window.location.search);
-  const mode = (params.get("mode") || "").replace(/[^a-zA-Z]/g, "").toLowerCase();
-  const color = (params.get("color") || "").replace(/[^a-fA-F0-9]/g, "").substring(0, 6);
+  const mode = (params.get("mode") || "").replace(/[^a-z]/gi, "").toLowerCase();
+  const color = (params.get("color") || "").replace(/[^a-f0-9]/gi, "").substring(0, 6);
   const amount = parseFloat(params.get("amount"));
   const invert = params.get("invert") === "true";
 
@@ -42,6 +60,7 @@ const readFromUrl = () => {
   state.invert = invert;
 };
 
+/** Push current state to URL without page reload. */
 const syncToUrl = () => {
   const url = new URL(window.location.href);
   url.searchParams.set("mode", state.mode);
@@ -52,7 +71,20 @@ const syncToUrl = () => {
 };
 
 // ==================== COLOR MATH ====================
+// Pure functions — no DOM access, safe to reuse elsewhere.
 
+/**
+ * Resolve raw hex digits to a full 7-char hex string.
+ * Accepts 3-char shorthand (e.g. "f57" → "#ff5577") or 6-char full hex.
+ * Returns null for any other length.
+ */
+const resolveHex = raw => {
+  if (raw.length === 6) return `#${raw}`;
+  if (raw.length === 3) return `#${raw[0]}${raw[0]}${raw[1]}${raw[1]}${raw[2]}${raw[2]}`;
+  return null;
+};
+
+/** Convert RGB (0-255) to ANSI 256-color code. */
 const rgbToAnsi = (r, g, b) => {
   const ar = r >= 75 ? Math.floor((r - 35) / 40) : 0;
   const ag = g >= 75 ? Math.floor((g - 35) / 40) : 0;
@@ -60,6 +92,11 @@ const rgbToAnsi = (r, g, b) => {
   return ar * 36 + ag * 6 + ab + 16;
 };
 
+/**
+ * Apply invert + lighten/darken to produce the output color.
+ * Amount is scaled relative to available lightness range so
+ * 100% always reaches pure white (lighten) or pure black (darken).
+ */
 const computeOutput = ({ color: inputColor, amount, mode, invert }) => {
   let color = tinycolor(inputColor);
 
@@ -84,6 +121,11 @@ const computeOutput = ({ color: inputColor, amount, mode, invert }) => {
   };
 };
 
+/**
+ * Generate a Tailwind-style shade ramp (50–950) from a base color.
+ * Lighter steps boost saturation slightly; darker steps reduce it.
+ * Step 500 matches the input color's natural lightness.
+ */
 const computeShadeScale = hexColor => {
   const { h, s: baseS, l: baseL } = tinycolor(hexColor).toHsl();
   const steps = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
@@ -118,6 +160,7 @@ const computeShadeScale = hexColor => {
   });
 };
 
+/** Compute four color harmony palettes via hue rotation. */
 const computeHarmonies = hexColor => {
   const { h, s, l } = tinycolor(hexColor).toHsl();
   const shift = deg => tinycolor({ h: (h + deg + 360) % 360, s, l }).toHexString();
@@ -130,6 +173,7 @@ const computeHarmonies = hexColor => {
   };
 };
 
+/** WCAG 2.1 relative luminance from linear RGB. */
 const luminance = ({ r, g, b }) => {
   const [rl, gl, bl] = [r, g, b].map(v => {
     v /= 255;
@@ -138,6 +182,10 @@ const luminance = ({ r, g, b }) => {
   return 0.2126 * rl + 0.7152 * gl + 0.0722 * bl;
 };
 
+/**
+ * WCAG contrast ratio between two colors.
+ * Returns ratio and pass/fail for AA (4.5:1), AA+ large (3:1), AAA (7:1).
+ */
 const computeContrast = (fgHex, bgHex) => {
   const fg = tinycolor(fgHex);
   const bg = tinycolor(bgHex);
@@ -158,6 +206,7 @@ const computeContrast = (fgHex, bgHex) => {
 const $ = sel => document.getElementById(sel);
 const $$ = sel => document.querySelectorAll(sel);
 
+/** Create an element with optional className and textContent. */
 const el = (tag, className, text) => {
   const node = document.createElement(tag);
   if (className) node.className = className;
@@ -166,6 +215,8 @@ const el = (tag, className, text) => {
 };
 
 // ==================== RENDER ====================
+// Each render function updates one bento card.
+// Focused inputs are skipped to avoid clobbering user input mid-type.
 
 const render = () => {
   const output = computeOutput(state);
@@ -182,10 +233,11 @@ const render = () => {
 
 const renderPickerInputs = () => {
   const { r, g, b } = tinycolor(state.color).toRgb();
-  $("hexInput").value = state.color;
-  $("rInput").value = r;
-  $("gInput").value = g;
-  $("bInput").value = b;
+  const active = document.activeElement;
+  if (active !== $("hexInput")) $("hexInput").value = state.color;
+  if (active !== $("rInput")) $("rInput").value = r;
+  if (active !== $("gInput")) $("gInput").value = g;
+  if (active !== $("bInput")) $("bInput").value = b;
 };
 
 const renderInputPreview = () => {
@@ -205,10 +257,11 @@ const renderSlider = () => {
   const slider = $("amountSlider");
   const input = $("amountInput");
   slider.value = state.amount;
-  input.value = state.amount;
+  if (document.activeElement !== input) input.value = state.amount;
   styleSlider(slider);
 };
 
+/** Fill the slider track with accent color up to the current percentage. */
 const styleSlider = slider => {
   const pct = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
   const accent = state.mode === "darken" ? "var(--nb-accent-2)" : "var(--nb-accent-1)";
@@ -229,6 +282,8 @@ const renderOutputs = ({ hex, rgb, hsl, hsv, ansi }) => {
 
 const renderContrast = fgHex => {
   const { contrastBg: bgHex } = state;
+  const contrastBgInput = $("contrastBgInput");
+  if (document.activeElement !== contrastBgInput) contrastBgInput.value = bgHex;
   const { ratio, aa, aaLarge, aaa } = computeContrast(fgHex, bgHex);
 
   const boxA = $("contrastBoxA");
@@ -251,6 +306,7 @@ const renderContrast = fgHex => {
   setBadge("badgeAAA", "AAA", aaa);
 };
 
+/** Build harmony swatches via safe DOM methods. Clicking a swatch sets it as input color. */
 const renderHarmonies = outputHex => {
   const container = $("harmoniesContainer");
   const harmonies = computeHarmonies(outputHex);
@@ -283,6 +339,7 @@ const renderHarmonies = outputHex => {
   );
 };
 
+/** Build shade scale steps via safe DOM methods. Clicking a step copies its hex. */
 const renderShades = outputHex => {
   const strip = $("shadeStrip");
   const shades = computeShadeScale(outputHex);
@@ -309,10 +366,11 @@ const copyToClipboard = async (text, triggerEl) => {
     await navigator.clipboard.writeText(text);
     showTooltip(triggerEl);
   } catch {
-    /* clipboard unavailable */
+    /* clipboard unavailable (e.g. non-HTTPS, iframe sandbox) */
   }
 };
 
+/** Show a "Copied!" tooltip above the trigger element for 2 seconds. */
 const showTooltip = target => {
   for (const tip of $$(".nb-tooltip--visible")) {
     tip.classList.remove("nb-tooltip--visible");
@@ -321,6 +379,7 @@ const showTooltip = target => {
   setTimeout(() => target.classList.remove("nb-tooltip--visible"), 2000);
 };
 
+/** Brief teal flash on copy button to confirm the action. */
 const flashCopyButton = btn => {
   btn.classList.add("nb-output-row__copy--flash");
   setTimeout(() => btn.classList.remove("nb-output-row__copy--flash"), 300);
@@ -330,6 +389,7 @@ const flashCopyButton = btn => {
 
 let wheelReady = false;
 
+/** Handle color wheel change events (fires continuously while dragging). */
 const onColorWheelChange = () => {
   if (!wheelReady) return;
   const hex = $("colorWheel").getAttribute("hex");
@@ -339,19 +399,57 @@ const onColorWheelChange = () => {
   syncToUrl();
 };
 
+/**
+ * Set the color wheel value without triggering a change loop.
+ * Temporarily disables wheelReady to suppress the change handler.
+ */
 const setColorWheel = hex => {
   wheelReady = false;
   $("colorWheel").setAttribute("hex", hex);
   wheelReady = true;
 };
 
+// ==================== HEX INPUT ====================
+// Shared validation for both the main hex input and contrast BG input.
+// On input: strip invalid chars, show error for incomplete hex, apply valid colors live.
+// On blur: expand shorthand (e.g. #f57 → #ff5577) and format the field.
+
+/**
+ * Live input handler — strips non-hex chars, toggles error state,
+ * returns resolved hex if valid (3 or 6 digits), null otherwise.
+ * Does NOT expand shorthand (that happens on blur).
+ */
+const handleHexInput = input => {
+  const raw = input.value.replace(/[^a-f0-9]/gi, "");
+  const formatted = raw.length > 0 ? `#${raw}` : input.value.replace(/^(#?)([a-f0-9]*).*/i, "$1$2");
+  if (input.value !== formatted) input.value = formatted;
+  const resolved = resolveHex(raw);
+  input.classList.toggle("nb-input--error", raw.length > 0 && !resolved);
+  return resolved;
+};
+
+/** Blur handler — expand shorthand, format field, apply color via callback. */
+const handleHexBlur = (input, apply) => {
+  const raw = input.value.replace(/[^a-f0-9]/gi, "");
+  const resolved = resolveHex(raw);
+  if (resolved && tinycolor(resolved).isValid()) {
+    input.value = resolved.toLowerCase();
+    input.classList.remove("nb-input--error");
+    apply(resolved.toLowerCase());
+  } else if (raw.length === 0) {
+    input.classList.remove("nb-input--error");
+  }
+};
+
 // ==================== EVENTS ====================
+// All events are delegated on the .bento container via data-action attributes.
 
 const setupEvents = () => {
   const bento = document.querySelector(".bento");
 
   $("colorWheel").addEventListener("change", onColorWheelChange);
 
+  // --- Click actions ---
   bento.addEventListener("click", e => {
     const target = e.target.closest("[data-action]");
     if (!target) return;
@@ -375,16 +473,21 @@ const setupEvents = () => {
     }
   });
 
+  // --- Live input actions ---
   bento.addEventListener("input", e => {
     const { target } = e;
     const { action } = target.dataset;
 
     if (action === "hex-input") {
-      let val = target.value.replace(/[^a-fA-F0-9#]/g, "");
-      if (!val.startsWith("#")) val = `#${val}`;
-      if (val.length === 7) {
-        setColorWheel(val);
-        setState({ color: val.toLowerCase() });
+      const result = handleHexInput(target);
+      if (result) {
+        setColorWheel(result);
+        setState({ color: result.toLowerCase() });
+      }
+    } else if (action === "contrast-bg-input") {
+      const result = handleHexInput(target);
+      if (result) {
+        setState({ contrastBg: result.toLowerCase() });
       }
     } else if (action === "rgb-input") {
       const v = Math.min(255, Math.max(0, parseInt(target.value, 10)));
@@ -405,18 +508,34 @@ const setupEvents = () => {
       setState({ amount: val });
     } else if (action === "toggle-invert") {
       setState({ invert: target.checked });
+    }
+  });
+
+  // --- Blur actions (formatting, clamping) ---
+  bento.addEventListener("focusout", e => {
+    const { target } = e;
+    const { action } = target.dataset;
+
+    if (action === "hex-input") {
+      handleHexBlur(target, hex => {
+        setColorWheel(hex);
+        setState({ color: hex });
+      });
     } else if (action === "contrast-bg-input") {
-      let val = target.value.trim();
-      if (!val.startsWith("#")) val = `#${val}`;
-      if (val.length === 7 && tinycolor(val).isValid()) {
-        state.contrastBg = val;
-        renderContrast(computeOutput(state).hex);
-      }
+      handleHexBlur(target, hex => {
+        setState({ contrastBg: hex });
+      });
+    } else if (action === "amount-input") {
+      // Clamp displayed value to 0–100 on blur
+      const val = Math.min(100, Math.max(0, parseFloat(target.value) || 0));
+      target.value = val;
+      setState({ amount: val });
     }
   });
 };
 
 // ==================== JSON API ====================
+// Append ?format=json to any URL to get all computed data as JSON.
 
 const buildJsonResponse = () => {
   const output = computeOutput(state);
@@ -452,6 +571,7 @@ const renderJsonPage = data => {
 };
 
 // ==================== INIT ====================
+// type="module" defers execution until DOM is parsed.
 
 readFromUrl();
 
@@ -463,9 +583,18 @@ if (new URLSearchParams(window.location.search).get("format") === "json") {
   render();
   setupEvents();
 
-  const loader = $("nb-loader");
-  if (loader) {
-    loader.hidden = true;
-    setTimeout(() => loader.remove(), 300);
+  // Dismiss loader after all resources (fonts, icons CDN) have loaded
+  const dismissLoader = () => {
+    const loader = $("nb-loader");
+    if (loader) {
+      loader.hidden = true;
+      setTimeout(() => loader.remove(), 500);
+    }
+  };
+
+  if (document.readyState === "complete") {
+    dismissLoader();
+  } else {
+    window.addEventListener("load", dismissLoader, { once: true });
   }
 }

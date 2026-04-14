@@ -163,6 +163,12 @@
   min-height: 44px;
 }
 
+.nb-input--error {
+  border-color: #cc0000;
+  background: #fff5f5;
+  box-shadow: 3px 3px 0 #cc0000;
+}
+
 .nb-input:focus {
   outline: 3px solid var(--nb-ink);
   outline-offset: 2px;
@@ -402,7 +408,7 @@
 }
 
 .nb-color-preview--lg {
-  height: 64px;
+  height: 128px;
   border: var(--nb-border);
   box-shadow: var(--nb-shadow-sm);
 }
