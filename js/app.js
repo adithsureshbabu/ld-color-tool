@@ -15,7 +15,7 @@
      COLOR WHEEL → integration with <reinvented-color-wheel>
      COLOR INPUT → format-aware validation for picker inputs
      EVENTS      → delegated click, input, focusout on .bento
-     JSON API    → ?format=json renders raw JSON output
+     JSON API    → ?type=json renders raw JSON output
      INIT        → entry point, boots the app or JSON mode
    ============================================ */
 
@@ -27,7 +27,8 @@ const DEFAULTS = Object.freeze({
   amount: 40,
   invert: false,
   contrastBg: "#ffffff",
-  format: "hex"
+  format: "hex",
+  palette: "brutalist"
 });
 
 const FORMATS = ["hex", "rgb", "hsl", "hsv", "ansi"];
@@ -47,7 +48,28 @@ const CHANNEL_CONFIG = {
   hsv: { labels: ["H", "S", "V"], maxes: [360, 100, 100] }
 };
 
-const isMultiFieldFormat = fmt => fmt in CHANNEL_CONFIG;
+/**
+ * Spin-wheel palette themes — 5 curated palettes, 12 colors each.
+ * Segment count matches wheel division (360° / 30°).
+ */
+const PALETTES = Object.freeze({
+  brutalist:   ["#FF6B9B", "#4ECDC4", "#F4C506", "#C3B1E1", "#2A9D8F", "#E76F51",
+                "#264653", "#F5F5F5", "#222222", "#6A4C93", "#F77F00", "#00B2CA"],
+  pastel:      ["#FFD6E0", "#C1E1C1", "#FFE5B4", "#B4E7F5", "#E6D7F5", "#FFDAB9",
+                "#D4F4DD", "#FFF1B8", "#C8E0F4", "#E8D5C4", "#FEDCBA", "#D1C4E9"],
+  neon:        ["#FF00FF", "#00FFFF", "#FFFF00", "#00FF00", "#FF0080", "#8000FF",
+                "#FF8000", "#00FF80", "#0080FF", "#FF4000", "#80FF00", "#FF0040"],
+  earth:       ["#8B4513", "#556B2F", "#B8860B", "#696969", "#CD853F", "#2F4F4F",
+                "#A0522D", "#6B8E23", "#D2691E", "#708090", "#8FBC8F", "#BDB76B"],
+  monochrome:  ["#FFFFFF", "#F0F0F0", "#D9D9D9", "#BFBFBF", "#A6A6A6", "#8C8C8C",
+                "#737373", "#595959", "#404040", "#262626", "#0D0D0D", "#000000"]
+});
+
+const PALETTE_KEYS = Object.keys(PALETTES);
+const SEGMENT_COUNT = 12;
+const SEGMENT_ANGLE = 360 / SEGMENT_COUNT;
+
+const isMultiFieldFormat = format => format in CHANNEL_CONFIG;
 
 const state = { ...DEFAULTS };
 
@@ -60,22 +82,24 @@ const setState = updates => {
 
 // ==================== URL SYNC ====================
 
-/** Parse URL query params (?mode, color, amount, invert, fmt) into state. */
+/** Parse URL query params (?mode, color, amount, invert, format) into state. */
 const readFromUrl = () => {
   const params = new URLSearchParams(window.location.search);
   const mode = (params.get("mode") || "").replace(/[^a-z]/gi, "").toLowerCase();
   const colorRaw = params.get("color") || "";
   const amount = parseFloat(params.get("amount"));
   const invert = params.get("invert") === "true";
-  const fmt = (params.get("fmt") || "").toLowerCase();
+  const format = (params.get("format") || "").toLowerCase();
+  const pal = (params.get("palette") || "").toLowerCase();
 
   if (mode === "lighten" || mode === "darken") state.mode = mode;
 
-  // Parse color based on fmt param; fall back to legacy hex parsing only
+  // Parse color based on format param; fall back to legacy hex parsing only
   // when the format is hex AND the param is clean hex chars (so
-  // mismatched inputs like ?color=rgb(255,107,107)&fmt=hex don't get
+  // mismatched inputs like ?color=rgb(255,107,107)&format=hex don't get
   // silently reinterpreted as garbage hex).
-  if (FORMATS.includes(fmt)) state.format = fmt;
+  if (FORMATS.includes(format)) state.format = format;
+  if (PALETTE_KEYS.includes(pal)) state.palette = pal;
   if (colorRaw) {
     const parsed = parseColorByFormat(colorRaw, state.format);
     if (parsed) {
@@ -83,7 +107,7 @@ const readFromUrl = () => {
     } else if (state.format === "hex") {
       // Legacy hex fallback — param may be bare hex without `#`
       // Reject if input has structural chars (parens, commas) that suggest
-      // the user meant a non-hex format but specified fmt=hex by mistake.
+      // the user meant a non-hex format but specified format=hex by mistake.
       const cleanInput = colorRaw.replace(/^#/, "");
       if (/^[a-f0-9]*$/i.test(cleanInput)) {
         const hex = cleanInput.substring(0, 6);
@@ -140,9 +164,14 @@ const syncToUrl = () => {
   url.searchParams.set("amount", state.amount);
   url.searchParams.set("invert", state.invert);
   if (state.format !== DEFAULTS.format) {
-    url.searchParams.set("fmt", state.format);
+    url.searchParams.set("format", state.format);
   } else {
-    url.searchParams.delete("fmt");
+    url.searchParams.delete("format");
+  }
+  if (state.palette !== DEFAULTS.palette) {
+    url.searchParams.set("palette", state.palette);
+  } else {
+    url.searchParams.delete("palette");
   }
   history.pushState({}, "", url);
 };
@@ -287,6 +316,28 @@ const parseColorByFormat = (input, format) => {
 };
 
 /**
+ * Build an SVG path `d` attribute for a pie-chart segment.
+ * Radius 100, centered at (0,0). Segment `i` is CENTERED on its index angle:
+ * segment 0 centered at 12 o'clock (spans visual [-15°, +15°]), segment 1
+ * centered at 1 o'clock, etc. Centering (rather than starting at i*30) lets
+ * the fixed pointer at 12 o'clock unambiguously target the middle of a
+ * segment, matching the landing formula in computeLandedIndex.
+ */
+const buildSegmentPath = (index, count) => {
+  const anglePer = 360 / count;
+  const startAngle = index * anglePer - anglePer / 2 - 90;
+  const endAngle = startAngle + anglePer;
+  const toRad = d => (d * Math.PI) / 180;
+  const r = 100;
+  const x1 = Math.cos(toRad(startAngle)) * r;
+  const y1 = Math.sin(toRad(startAngle)) * r;
+  const x2 = Math.cos(toRad(endAngle)) * r;
+  const y2 = Math.sin(toRad(endAngle)) * r;
+  const largeArc = anglePer > 180 ? 1 : 0;
+  return `M 0 0 L ${x1.toFixed(3)} ${y1.toFixed(3)} A ${r} ${r} 0 ${largeArc} 1 ${x2.toFixed(3)} ${y2.toFixed(3)} Z`;
+};
+
+/**
  * Apply invert + lighten/darken to produce the output color.
  * Amount is scaled relative to available lightness range so
  * 100% always reaches pure white (lighten) or pure black (darken).
@@ -423,6 +474,7 @@ const render = () => {
   renderContrast(output.hex);
   renderHarmonies(output.hex);
   renderShades(output.hex);
+  renderSpinWheel();
 };
 
 const renderPickerInputs = () => {
@@ -614,6 +666,28 @@ const renderShades = outputHex => {
   );
 };
 
+/** Render/refresh the spin wheel's segment fills for the active palette. */
+const renderSpinWheel = () => {
+  const wheel = $("spinWheel");
+  const paletteSelect = $("paletteSelect");
+  if (paletteSelect.value !== state.palette) paletteSelect.value = state.palette;
+
+  const palette = PALETTES[state.palette];
+  const needsRebuild = wheel.dataset.palette !== state.palette;
+
+  if (needsRebuild) {
+    wheel.dataset.palette = state.palette;
+    wheel.replaceChildren(
+      ...palette.map((hex, i) => {
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", buildSegmentPath(i, SEGMENT_COUNT));
+        path.setAttribute("fill", hex);
+        return path;
+      })
+    );
+  }
+};
+
 // ==================== CLIPBOARD ====================
 
 const copyToClipboard = async (text, triggerEl) => {
@@ -662,6 +736,60 @@ const setColorWheel = hex => {
   wheelReady = false;
   $("colorWheel").setAttribute("hex", hex);
   wheelReady = true;
+};
+
+// ==================== SPIN WHEEL ====================
+
+let currentWheelAngle = 0;
+let spinning = false;
+let spinFallbackTimer = null;
+
+const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+/**
+ * Derive which segment is under the pointer from the cumulative rotation.
+ * Rotating the wheel +X° clockwise moves segment 0 away from the pointer by X°,
+ * so the segment at -X° mod 360 on the wheel lands under the pointer.
+ * Adding SEGMENT_ANGLE/2 shifts the boundary so each segment's center (not edge)
+ * is the target.
+ */
+const computeLandedIndex = angle => {
+  const normalized = ((360 - (angle % 360)) + 360) % 360;
+  return Math.floor((normalized + SEGMENT_ANGLE / 2) / SEGMENT_ANGLE) % SEGMENT_COUNT;
+};
+
+/** Called when the spin settles — apply landed color, unlock UI. */
+const onSpinComplete = () => {
+  if (!spinning) return;
+  spinning = false;
+  clearTimeout(spinFallbackTimer);
+  spinFallbackTimer = null;
+
+  $("spinButton").disabled = false;
+  $("paletteSelect").disabled = false;
+
+  const landedIndex = computeLandedIndex(currentWheelAngle);
+  const landedHex = PALETTES[state.palette][landedIndex];
+
+  setColorWheel(landedHex);
+  setState({ color: landedHex.toLowerCase() });
+};
+
+/** Kick off a spin — compute target angle, apply transform, lock UI. */
+const handleSpin = () => {
+  if (spinning) return;
+  spinning = true;
+
+  $("spinButton").disabled = true;
+  $("paletteSelect").disabled = true;
+
+  const rotations = randomInt(4, 6);
+  const offset = Math.random() * 360;
+  currentWheelAngle = currentWheelAngle + rotations * 360 + offset;
+
+  $("spinWheel").style.transform = `rotate(${currentWheelAngle}deg)`;
+
+  spinFallbackTimer = setTimeout(onSpinComplete, 3500);
 };
 
 // ==================== COLOR INPUT ====================
@@ -758,14 +886,26 @@ const setupEvents = () => {
     } else if (action === "set-color") {
       setColorWheel(target.dataset.color);
       setState({ color: target.dataset.color });
+    } else if (action === "spin") {
+      handleSpin();
     }
   });
 
-  // --- Format select (change event) ---
+  $("spinWheel").addEventListener("transitionend", e => {
+    if (e.target === $("spinWheel") && e.propertyName === "transform") {
+      onSpinComplete();
+    }
+  });
+
+  // --- Select change events ---
   bento.addEventListener("change", e => {
-    if (e.target.dataset.action === "format-select") {
-      const fmt = e.target.value;
-      if (FORMATS.includes(fmt)) setState({ format: fmt });
+    const { action } = e.target.dataset;
+    if (action === "format-select") {
+      const format = e.target.value;
+      if (FORMATS.includes(format)) setState({ format });
+    } else if (action === "set-palette") {
+      const pal = e.target.value;
+      if (PALETTE_KEYS.includes(pal)) setState({ palette: pal });
     }
   });
 
@@ -848,7 +988,7 @@ const setupEvents = () => {
 };
 
 // ==================== JSON API ====================
-// Append ?format=json to any URL to get all computed data as JSON.
+// Append ?type=json to any URL to get all computed data as JSON.
 
 const buildJsonResponse = () => {
   const output = computeOutput(state);
@@ -857,7 +997,13 @@ const buildJsonResponse = () => {
   const shades = computeShadeScale(output.hex);
 
   return {
-    input: { color: state.color, mode: state.mode, amount: state.amount, invert: state.invert },
+    input: {
+      color: state.color,
+      mode: state.mode,
+      amount: state.amount,
+      invert: state.invert,
+      palette: state.palette
+    },
     output: { hex: output.hex, rgb: output.rgb, hsl: output.hsl, hsv: output.hsv, ansi: output.ansi },
     contrast: {
       background: state.contrastBg,
@@ -888,12 +1034,15 @@ const renderJsonPage = data => {
 
 readFromUrl();
 
-if (new URLSearchParams(window.location.search).get("format") === "json") {
+if (new URLSearchParams(window.location.search).get("type") === "json") {
   renderJsonPage(buildJsonResponse());
 } else {
   setColorWheel(state.color);
   wheelReady = true;
   render();
+  // Normalize the URL on load — clean up unknown/invalid params that
+  // readFromUrl silently fell back to defaults for (e.g. ?palette=bogus).
+  syncToUrl();
   setupEvents();
 
   // Dismiss loader after all resources (fonts, icons CDN) have loaded

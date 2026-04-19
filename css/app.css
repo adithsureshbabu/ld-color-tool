@@ -64,7 +64,7 @@ body {
 }
 
 .bento-shades {
-  grid-column: span 3;
+  grid-row: span 2;
 }
 
 /* ---------- Card Internals ---------- */
@@ -72,7 +72,9 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-evenly;
   gap: var(--nb-space-md);
+  height: 100%;
 }
 
 .picker-wheel {
@@ -226,7 +228,9 @@ body {
 .contrast-layout {
   display: flex;
   flex-direction: column;
+  justify-content: space-evenly;
   gap: var(--nb-space-md);
+  height: 100%;
 }
 
 .contrast-previews {
@@ -318,18 +322,103 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--nb-space-md);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  height: 100%;
+  padding-bottom: var(--nb-space-lg);
 }
 
-.shades-layout::-webkit-scrollbar {
-  display: none;
+/* Vertical shade strip on desktop — each step full-width of col, stacked. */
+.bento-shades .nb-shade-strip {
+  flex: 1;
+  flex-direction: column;
 }
 
-.nb-shade-strip {
-  min-width: 550px;
+.bento-shades .nb-shade-step {
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-right: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  min-height: 40px;
+}
+
+.bento-shades .nb-shade-step:last-child {
+  border-bottom: none;
+}
+
+.bento-shades .nb-shade-step:hover {
+  transform: translateX(2px);
+}
+
+.bento-shades .nb-shade-step__num {
+  font-size: 12px;
+}
+
+.bento-shades .nb-shade-step__hex {
+  font-size: 11px;
+}
+
+/* ---------- Spin Wheel Card ---------- */
+.spin-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nb-space-md);
+  align-items: center;
+}
+
+.spin-layout .nb-select {
+  width: 100%;
+}
+
+.spin-wheel-frame {
+  position: relative;
+  width: 100%;
+  max-width: 240px;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spin-wheel {
+  width: clamp(180px, 100%, 240px);
+  height: auto;
+  display: block;
+  transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 1);
+  will-change: transform;
+  border-radius: 50%;
+  border: var(--nb-border-sm);
+  background: var(--nb-surface);
+}
+
+.spin-wheel path {
+  stroke: var(--nb-ink);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.spin-pointer {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 20px solid var(--nb-ink);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.spin-button {
+  width: 100%;
+  background: var(--nb-accent-3);
+}
+
+.spin-button:disabled,
+.spin-layout .nb-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ---------- Responsive: Tablet ---------- */
@@ -356,11 +445,50 @@ body {
   }
 
   .bento-harmonies {
+    grid-column: span 2;
+  }
+
+  .bento-spin {
     grid-column: span 1;
   }
 
   .bento-shades {
     grid-column: span 2;
+    grid-row: span 1;
+  }
+
+  /* Revert vertical shade strip on narrower viewports — use horizontal layout
+     with horizontal scroll if content exceeds viewport. */
+  .shades-layout {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .shades-layout::-webkit-scrollbar {
+    display: none;
+  }
+
+  .bento-shades .nb-shade-strip {
+    flex-direction: row;
+    min-width: 550px;
+  }
+
+  .bento-shades .nb-shade-step {
+    flex-direction: column;
+    justify-content: center;
+    padding: 12px 4px;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: none;
+    min-height: 56px;
+  }
+
+  .bento-shades .nb-shade-step:last-child {
+    border-right: none;
+  }
+
+  .bento-shades .nb-shade-step:hover {
+    transform: translateY(-2px);
   }
 
   .picker-layout {
@@ -391,7 +519,8 @@ body {
   .bento-outputs,
   .bento-contrast,
   .bento-harmonies,
-  .bento-shades {
+  .bento-shades,
+  .bento-spin {
     grid-column: span 1;
     grid-row: span 1;
   }
@@ -413,5 +542,43 @@ body {
 
   .contrast-ratio {
     font-size: 22px;
+  }
+
+  /* On mobile, cards size to natural content height — remove the
+     `height: 100%` + `space-evenly` pattern so items aren't pressed
+     against the card's bottom border. Default flex-start with
+     card padding handles spacing naturally. */
+  .picker-layout,
+  .contrast-layout {
+    height: auto;
+    justify-content: flex-start;
+  }
+
+  /* Revert to vertical shade strip on mobile — narrow columns can't fit
+     11 horizontal steps without off-screen overflow. */
+  .shades-layout {
+    overflow: visible;
+  }
+
+  .bento-shades .nb-shade-strip {
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .bento-shades .nb-shade-step {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-right: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    min-height: 40px;
+  }
+
+  .bento-shades .nb-shade-step:last-child {
+    border-bottom: none;
+  }
+
+  .bento-shades .nb-shade-step:hover {
+    transform: translateX(2px);
   }
 }

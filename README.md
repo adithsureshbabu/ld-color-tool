@@ -14,8 +14,9 @@ Built with a neo-brutalist UI using a [portable design system](#neo-brutalist-de
 - **Contrast checker** - WCAG 2.1 compliance check (AA, AA+, AAA) against a configurable background
 - **Shade scale** - Tailwind-style 11-step shade ramp (50-950), horizontally scrollable on mobile
 - **Color harmonies** - Complementary, analogous, triadic, and split-complementary palettes; click a swatch to set it as input
+- **Spin-the-wheel color picker** - Click SPIN on the palette wheel to land on a random color from a curated theme (Brutalist, Pastel, Neon, Earth, Monochrome)
 - **Reset** - One-click reset of amount and invert (preserves color and mode)
-- **JSON output** - Append `format=json` to get all computed data as JSON
+- **JSON output** - Append `type=json` to get all computed data as JSON
 - **Deep-linking** - Share exact color states via URL query parameters
 - **Responsive** - Bento grid layout adapts across desktop, tablet, and mobile
 
@@ -36,21 +37,22 @@ Share a specific color state by appending query params:
 
 ```
 ?mode=darken&color=ff6b6b&amount=60&invert=true
-?mode=lighten&color=255,107,107&fmt=rgb&amount=30
+?mode=lighten&color=255,107,107&format=rgb&amount=30
 ```
 
 | Param | Values | Default |
 |---|---|---|
 | `mode` | `lighten`, `darken` | `lighten` |
-| `color` | value depends on `fmt` (see below) | `0099dd` |
+| `color` | value depends on `format` (see below) | `0099dd` |
 | `amount` | `0` - `100` | `40` |
 | `invert` | `true`, `false` | `false` |
-| `fmt` | `hex`, `rgb`, `hsl`, `hsv`, `ansi` | `hex` |
-| `format` | `json` | *(none)* |
+| `format` | `hex`, `rgb`, `hsl`, `hsv`, `ansi` | `hex` |
+| `palette` | `brutalist`, `pastel`, `neon`, `earth`, `monochrome` | `brutalist` |
+| `type` | `json` | *(none)* |
 
-The `color` value format follows the selected `fmt`:
+The `color` value format follows the selected `format`:
 
-| fmt | color format | example |
+| format | color format | example |
 |---|---|---|
 | `hex` | `RRGGBB` or `RGB` (shorthand) | `ff6b6b` |
 | `rgb` | `r,g,b` (0-255 each) | `255,107,107` |
@@ -60,10 +62,10 @@ The `color` value format follows the selected `fmt`:
 
 ### JSON Output
 
-Append `&format=json` to any URL to get the full computed result as JSON instead of the UI:
+Append `&type=json` to any URL to get the full computed result as JSON instead of the UI:
 
 ```
-?color=ff6b6b&mode=darken&amount=60&invert=true&format=json
+?color=ff6b6b&mode=darken&amount=60&invert=true&type=json
 ```
 
 Returns all input parameters, output values (HEX, RGB, HSL, HSV, ANSI), contrast checker results (ratio, AA/AA+/AAA), color harmonies (complementary, analogous, triadic, split-complementary), and the full 11-step shade scale.

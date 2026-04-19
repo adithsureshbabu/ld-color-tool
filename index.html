@@ -249,6 +249,54 @@
         </div>
       </section>
 
+      <!-- Spin Wheel -->
+      <section
+        class="nb-card bento-spin"
+        aria-label="Spin the wheel for a random color"
+        aria-live="polite"
+      >
+        <div class="nb-card-label" style="color: var(--nb-accent-1)">Spin the wheel</div>
+        <div class="spin-layout">
+          <select
+            class="nb-select nb-select--accent"
+            id="paletteSelect"
+            data-action="set-palette"
+            aria-label="Palette theme"
+            title="Choose a palette theme"
+          >
+            <option value="brutalist">Brutalist</option>
+            <option value="pastel">Pastel</option>
+            <option value="neon">Neon</option>
+            <option value="earth">Earth</option>
+            <option value="monochrome">Monochrome</option>
+          </select>
+
+          <div class="spin-wheel-frame">
+            <div class="spin-pointer" aria-hidden="true"></div>
+            <svg
+              id="spinWheel"
+              class="spin-wheel"
+              viewBox="-100 -100 200 200"
+              xmlns="http://www.w3.org/2000/svg"
+              role="img"
+              aria-label="Color wheel"
+            >
+              <!-- 12 <path> segments rendered by JS -->
+            </svg>
+          </div>
+
+          <button
+            class="nb-btn spin-button"
+            id="spinButton"
+            data-action="spin"
+            aria-label="Spin the wheel to pick a random color"
+            title="Spin the wheel"
+          >
+            SPIN
+          </button>
+        </div>
+      </section>
+
       <!-- Contrast Checker -->
       <section class="nb-card bento-contrast" aria-label="Contrast checker">
         <div class="nb-card-label" style="color: var(--nb-accent-2)">Contrast checker</div>
@@ -277,18 +325,18 @@
         </div>
       </section>
 
-      <!-- Color Harmonies -->
-      <section class="nb-card bento-harmonies" aria-label="Color harmonies">
-        <div class="nb-card-label" style="color: var(--nb-accent-4)">Color harmonies</div>
-        <div class="harmonies-layout" id="harmoniesContainer"></div>
-      </section>
-
       <!-- Shade Scale -->
       <section class="nb-card bento-shades" aria-label="Shade scale">
         <div class="nb-card-label" style="color: var(--nb-accent-3)">Shade scale</div>
         <div class="shades-layout">
           <div class="nb-shade-strip" id="shadeStrip"></div>
         </div>
+      </section>
+
+      <!-- Color Harmonies -->
+      <section class="nb-card bento-harmonies" aria-label="Color harmonies">
+        <div class="nb-card-label" style="color: var(--nb-accent-4)">Color harmonies</div>
+        <div class="harmonies-layout" id="harmoniesContainer"></div>
       </section>
     </main>
 
