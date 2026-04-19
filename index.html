@@ -75,57 +75,22 @@
           </div>
           <div class="nb-color-preview nb-color-preview--sm" id="inputPreview"></div>
           <div class="picker-inputs">
-            <div class="picker-hex-row">
-              <span class="picker-hex-label">HEX</span>
-              <input
-                type="text"
-                class="nb-input"
-                id="hexInput"
-                maxlength="7"
-                data-action="hex-input"
-                title="Enter hex color (e.g. #ff6b6b)"
-                style="flex: 1"
-              />
-            </div>
-            <div class="picker-rgb-row">
-              <div class="picker-rgb-field">
-                <label for="rInput">R</label>
-                <input
-                  type="number"
-                  class="nb-input"
-                  id="rInput"
-                  min="0"
-                  max="255"
-                  data-action="rgb-input"
-                  data-channel="r"
-                  title="Red channel (0–255)"
-                />
-              </div>
-              <div class="picker-rgb-field">
-                <label for="gInput">G</label>
-                <input
-                  type="number"
-                  class="nb-input"
-                  id="gInput"
-                  min="0"
-                  max="255"
-                  data-action="rgb-input"
-                  data-channel="g"
-                  title="Green channel (0–255)"
-                />
-              </div>
-              <div class="picker-rgb-field">
-                <label for="bInput">B</label>
-                <input
-                  type="number"
-                  class="nb-input"
-                  id="bInput"
-                  min="0"
-                  max="255"
-                  data-action="rgb-input"
-                  data-channel="b"
-                  title="Blue channel (0–255)"
-                />
+            <div class="picker-input-row">
+              <select
+                class="nb-select nb-select--accent picker-format-select"
+                id="formatSelect"
+                data-action="format-select"
+                aria-label="Input color format"
+                title="Choose input color format"
+              >
+                <option value="hex">HEX</option>
+                <option value="rgb">RGB</option>
+                <option value="hsl">HSL</option>
+                <option value="hsv">HSV</option>
+                <option value="ansi">ANSI</option>
+              </select>
+              <div class="picker-input-area" id="colorInputArea">
+                <!-- Rendered by JS based on selected format -->
               </div>
             </div>
           </div>

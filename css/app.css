@@ -95,51 +95,76 @@ body {
   padding-top: var(--nb-space-md);
 }
 
-.picker-hex-row {
+.picker-input-row {
   display: flex;
   gap: var(--nb-space-sm);
+  align-items: flex-end;
+  min-height: 57px;
 }
 
-.picker-hex-row .nb-input {
+.picker-format-select {
+  flex-shrink: 0;
+  padding-left: 10px;
+  padding-right: 22px;
+  font-size: 13px;
+  background-position: right 6px center;
+}
+
+.picker-input-area {
+  flex: 1;
+  display: flex;
+  gap: var(--nb-space-xs);
   min-width: 0;
 }
 
-.picker-hex-label {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 50px;
-  padding: 8px 12px;
-  background: var(--nb-accent-1);
-  border: var(--nb-border-sm);
-  font-family: var(--nb-font-mono);
-  font-size: 12px;
-  font-weight: 700;
+.picker-input-area .nb-input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 8px;
+  font-size: 13px;
+  text-align: left;
+  -moz-appearance: textfield;
+  appearance: textfield;
 }
 
-.picker-rgb-row {
-  display: flex;
-  gap: var(--nb-space-xs);
+.picker-input-area .nb-input::-webkit-outer-spin-button,
+.picker-input-area .nb-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
-.picker-rgb-field {
+.picker-channel {
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--nb-space-xs);
+  gap: 2px;
+  min-width: 0;
 }
 
-.picker-rgb-field label {
+.picker-channel__label {
   font-family: var(--nb-font-mono);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: var(--nb-ink-muted);
+  text-align: center;
+  line-height: 1;
 }
 
-.picker-rgb-field .nb-input {
+.picker-channel .nb-input {
   width: 100%;
   min-width: 0;
+  min-height: 44px;
+  padding: 8px 4px;
+  font-size: 13px;
+  text-align: center;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.picker-channel .nb-input::-webkit-outer-spin-button,
+.picker-channel .nb-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .adjust-header {
@@ -216,6 +241,7 @@ body {
   justify-content: center;
   padding: var(--nb-space-md);
   border: var(--nb-border-sm);
+  box-shadow: var(--nb-shadow-sm);
   font-family: var(--nb-font-heading);
   font-size: 14px;
   font-weight: 700;

@@ -11,7 +11,7 @@
   --nb-surface: #FFFFFF;
   --nb-ink: #222222;
   --nb-ink-muted: #555555;
-  --nb-accent-1: #FF6B6B;
+  --nb-accent-1: #FF6B9B;
   --nb-accent-2: #4ECDC4;
   --nb-accent-3: #F4C506;
   --nb-accent-4: #C3B1E1;
@@ -108,6 +108,35 @@
 
 .nb-toggle-group .nb-btn:not(:first-child) {
   margin-left: -2px;
+}
+
+/* ---------- Select ---------- */
+.nb-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--nb-surface);
+  border: var(--nb-border-sm);
+  padding: 8px 28px 8px 12px;
+  font-family: var(--nb-font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--nb-ink);
+  cursor: pointer;
+  min-height: 44px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6' fill='none' stroke='%23222222' stroke-width='2'><path d='M1 1l4 4 4-4'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 10px 6px;
+}
+
+.nb-select:focus {
+  outline: 3px solid var(--nb-ink);
+  outline-offset: 2px;
+}
+
+.nb-select--accent {
+  background-color: var(--nb-accent-1);
 }
 
 /* ---------- Checkbox (brutalist) ---------- */
@@ -401,16 +430,16 @@
 .nb-color-preview {
   width: 100%;
   border: var(--nb-border-sm);
+  box-shadow: var(--nb-shadow-sm);
 }
 
 .nb-color-preview--sm {
-  height: 48px;
+  height: 64px;
 }
 
 .nb-color-preview--lg {
   height: 128px;
   border: var(--nb-border);
-  box-shadow: var(--nb-shadow-sm);
 }
 
 /* ---------- Accessibility ---------- */

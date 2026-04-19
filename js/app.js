@@ -13,7 +13,7 @@
      RENDER      → updates each bento card from state
      CLIPBOARD   → copy-to-clipboard + tooltip feedback
      COLOR WHEEL → integration with <reinvented-color-wheel>
-     HEX INPUT   → shared validation for hex color fields
+     COLOR INPUT → format-aware validation for picker inputs
      EVENTS      → delegated click, input, focusout on .bento
      JSON API    → ?format=json renders raw JSON output
      INIT        → entry point, boots the app or JSON mode
@@ -26,8 +26,28 @@ const DEFAULTS = Object.freeze({
   mode: "lighten",
   amount: 40,
   invert: false,
-  contrastBg: "#ffffff"
+  contrastBg: "#ffffff",
+  format: "hex"
 });
+
+const FORMATS = ["hex", "rgb", "hsl", "hsv", "ansi"];
+
+const FORMAT_PLACEHOLDERS = {
+  hex: "#ff6b6b or #f57",
+  rgb: "rgb(255, 107, 107)",
+  hsl: "hsl(0, 100%, 71%)",
+  hsv: "hsv(0, 58%, 100%)",
+  ansi: "0-255 (e.g. 203)"
+};
+
+/** Multi-channel format configuration — channel labels and max values. */
+const CHANNEL_CONFIG = {
+  rgb: { labels: ["R", "G", "B"], maxes: [255, 255, 255] },
+  hsl: { labels: ["H", "S", "L"], maxes: [360, 100, 100] },
+  hsv: { labels: ["H", "S", "V"], maxes: [360, 100, 100] }
+};
+
+const isMultiFieldFormat = fmt => fmt in CHANNEL_CONFIG;
 
 const state = { ...DEFAULTS };
 
@@ -40,33 +60,90 @@ const setState = updates => {
 
 // ==================== URL SYNC ====================
 
-/** Parse URL query params (?mode, color, amount, invert) into state. */
+/** Parse URL query params (?mode, color, amount, invert, fmt) into state. */
 const readFromUrl = () => {
   const params = new URLSearchParams(window.location.search);
   const mode = (params.get("mode") || "").replace(/[^a-z]/gi, "").toLowerCase();
-  const color = (params.get("color") || "").replace(/[^a-f0-9]/gi, "").substring(0, 6);
+  const colorRaw = params.get("color") || "";
   const amount = parseFloat(params.get("amount"));
   const invert = params.get("invert") === "true";
+  const fmt = (params.get("fmt") || "").toLowerCase();
 
   if (mode === "lighten" || mode === "darken") state.mode = mode;
-  if (color.length === 6) {
-    state.color = `#${color.toLowerCase()}`;
-  } else if (color.length === 3) {
-    state.color = `#${color[0]}${color[0]}${color[1]}${color[1]}${color[2]}${color[2]}`.toLowerCase();
+
+  // Parse color based on fmt param; fall back to legacy hex parsing only
+  // when the format is hex AND the param is clean hex chars (so
+  // mismatched inputs like ?color=rgb(255,107,107)&fmt=hex don't get
+  // silently reinterpreted as garbage hex).
+  if (FORMATS.includes(fmt)) state.format = fmt;
+  if (colorRaw) {
+    const parsed = parseColorByFormat(colorRaw, state.format);
+    if (parsed) {
+      state.color = parsed.toLowerCase();
+    } else if (state.format === "hex") {
+      // Legacy hex fallback — param may be bare hex without `#`
+      // Reject if input has structural chars (parens, commas) that suggest
+      // the user meant a non-hex format but specified fmt=hex by mistake.
+      const cleanInput = colorRaw.replace(/^#/, "");
+      if (/^[a-f0-9]*$/i.test(cleanInput)) {
+        const hex = cleanInput.substring(0, 6);
+        if (hex.length === 6) state.color = `#${hex.toLowerCase()}`;
+        else if (hex.length === 3) {
+          state.color = `#${hex[0]}${hex[0]}${hex[1]}${hex[1]}${hex[2]}${hex[2]}`.toLowerCase();
+        }
+      }
+    }
+    // For non-hex formats with an unparseable color, leave state.color at default
   }
+
   if (!isNaN(amount) && amount >= 0 && amount <= 100) {
     state.amount = Math.round(amount * 10) / 10;
   }
   state.invert = invert;
 };
 
+/**
+ * Format a hex color for URL storage — compact, readable form.
+ *   hex:  "ff6b6b"
+ *   rgb:  "255,107,107"
+ *   hsl:  "0,100,71"
+ *   hsv:  "0,58,100"
+ *   ansi: "203"
+ */
+const formatColorForUrl = (hex, format) => {
+  const c = tinycolor(hex);
+  if (format === "hex") return hex.replace("#", "");
+  if (format === "rgb") {
+    const { r, g, b } = c.toRgb();
+    return `${r},${g},${b}`;
+  }
+  if (format === "hsl") {
+    const { h, s, l } = c.toHsl();
+    return `${Math.round(h)},${Math.round(s * 100)},${Math.round(l * 100)}`;
+  }
+  if (format === "hsv") {
+    const { h, s, v } = c.toHsv();
+    return `${Math.round(h)},${Math.round(s * 100)},${Math.round(v * 100)}`;
+  }
+  if (format === "ansi") {
+    const { r, g, b } = c.toRgb();
+    return String(rgbToAnsi(r, g, b));
+  }
+  return hex.replace("#", "");
+};
+
 /** Push current state to URL without page reload. */
 const syncToUrl = () => {
   const url = new URL(window.location.href);
   url.searchParams.set("mode", state.mode);
-  url.searchParams.set("color", state.color.replace("#", ""));
+  url.searchParams.set("color", formatColorForUrl(state.color, state.format));
   url.searchParams.set("amount", state.amount);
   url.searchParams.set("invert", state.invert);
+  if (state.format !== DEFAULTS.format) {
+    url.searchParams.set("fmt", state.format);
+  } else {
+    url.searchParams.delete("fmt");
+  }
   history.pushState({}, "", url);
 };
 
@@ -90,6 +167,123 @@ const rgbToAnsi = (r, g, b) => {
   const ag = g >= 75 ? Math.floor((g - 35) / 40) : 0;
   const ab = b >= 75 ? Math.floor((b - 35) / 40) : 0;
   return ar * 36 + ag * 6 + ab + 16;
+};
+
+/**
+ * Convert ANSI 256 code (0-255) to RGB using the xterm palette.
+ * 16-231: 6×6×6 color cube. 232-255: grayscale. 0-15: system colors.
+ */
+const ANSI_LEVELS = [0, 95, 135, 175, 215, 255];
+const ANSI_SYSTEM = [
+  [0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
+  [0, 0, 128], [128, 0, 128], [0, 128, 128], [192, 192, 192],
+  [128, 128, 128], [255, 0, 0], [0, 255, 0], [255, 255, 0],
+  [0, 0, 255], [255, 0, 255], [0, 255, 255], [255, 255, 255]
+];
+
+const ansiToRgb = n => {
+  if (!Number.isInteger(n) || n < 0 || n > 255) return null;
+  if (n < 16) {
+    const [r, g, b] = ANSI_SYSTEM[n];
+    return { r, g, b };
+  }
+  if (n >= 232) {
+    const v = (n - 232) * 10 + 8;
+    return { r: v, g: v, b: v };
+  }
+  const i = n - 16;
+  return {
+    r: ANSI_LEVELS[Math.floor(i / 36)],
+    g: ANSI_LEVELS[Math.floor((i % 36) / 6)],
+    b: ANSI_LEVELS[i % 6]
+  };
+};
+
+/** Convert a hex color to a display string in the given format. */
+const formatColor = (hex, format) => {
+  const c = tinycolor(hex);
+  switch (format) {
+    case "hex": return c.toHexString();
+    case "rgb": return c.toRgbString();
+    case "hsl": return c.toHslString();
+    case "hsv": return c.toHsvString();
+    case "ansi": {
+      const { r, g, b } = c.toRgb();
+      return String(rgbToAnsi(r, g, b));
+    }
+    default: return c.toHexString();
+  }
+};
+
+/**
+ * Extract channel values from a hex color in the given multi-field format.
+ * Returns [a, b, c] rounded to integers: [r,g,b], [h,s%,l%], or [h,s%,v%].
+ */
+const getChannelValues = (hex, format) => {
+  const c = tinycolor(hex);
+  if (format === "rgb") {
+    const { r, g, b } = c.toRgb();
+    return [r, g, b];
+  }
+  if (format === "hsl") {
+    const { h, s, l } = c.toHsl();
+    return [Math.round(h), Math.round(s * 100), Math.round(l * 100)];
+  }
+  if (format === "hsv") {
+    const { h, s, v } = c.toHsv();
+    return [Math.round(h), Math.round(s * 100), Math.round(v * 100)];
+  }
+  return [0, 0, 0];
+};
+
+/** Build a hex color from 3 channel values in the given multi-field format. */
+const channelsToHex = (values, format) => {
+  const [a, b, c] = values;
+  const obj =
+    format === "rgb" ? { r: a, g: b, b: c }
+    : format === "hsl" ? { h: a, s: b, l: c }
+    : /* hsv */ { h: a, s: b, v: c };
+  const parsed = tinycolor(obj);
+  return parsed.isValid() ? parsed.toHexString() : null;
+};
+
+/**
+ * Parse a user input string in the given format to a hex color.
+ * Accepts both full syntax (e.g. "rgb(255,107,107)") and bare
+ * comma-separated numbers (e.g. "255,107,107"). Returns hex string
+ * if valid, null otherwise.
+ */
+const parseColorByFormat = (input, format) => {
+  if (!input) return null;
+  const trimmed = input.trim();
+
+  if (format === "hex") {
+    const raw = trimmed.replace(/[^a-f0-9]/gi, "");
+    return resolveHex(raw);
+  }
+
+  if (format === "ansi") {
+    const n = parseInt(trimmed, 10);
+    if (isNaN(n)) return null;
+    const rgb = ansiToRgb(n);
+    return rgb ? tinycolor(rgb).toHexString() : null;
+  }
+
+  // Try bare "a,b,c" (e.g. "255,107,107") — used for compact URL storage
+  const bareMatch = trimmed.match(/^(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?)$/);
+  if (bareMatch) {
+    const [a, b, c] = [parseFloat(bareMatch[1]), parseFloat(bareMatch[2]), parseFloat(bareMatch[3])];
+    const obj =
+      format === "rgb" ? { r: a, g: b, b: c }
+      : format === "hsl" ? { h: a, s: b, l: c }
+      : /* hsv */ { h: a, s: b, v: c };
+    const parsed = tinycolor(obj);
+    return parsed.isValid() ? parsed.toHexString() : null;
+  }
+
+  // Full syntax — tinycolor parses rgb(...), hsl(...), hsv(...) directly
+  const parsed = tinycolor(trimmed);
+  return parsed.isValid() ? parsed.toHexString() : null;
 };
 
 /**
@@ -232,12 +426,73 @@ const render = () => {
 };
 
 const renderPickerInputs = () => {
-  const { r, g, b } = tinycolor(state.color).toRgb();
+  const formatSelect = $("formatSelect");
+  if (formatSelect.value !== state.format) formatSelect.value = state.format;
+
+  const container = $("colorInputArea");
   const active = document.activeElement;
-  if (active !== $("hexInput")) $("hexInput").value = state.color;
-  if (active !== $("rInput")) $("rInput").value = r;
-  if (active !== $("gInput")) $("gInput").value = g;
-  if (active !== $("bInput")) $("bInput").value = b;
+  const currentFormat = container.dataset.format;
+  const needsRebuild = currentFormat !== state.format;
+
+  if (isMultiFieldFormat(state.format)) {
+    const { labels, maxes } = CHANNEL_CONFIG[state.format];
+    const values = getChannelValues(state.color, state.format);
+
+    if (needsRebuild) {
+      container.dataset.format = state.format;
+      container.replaceChildren(
+        ...labels.map((label, i) => {
+          const field = el("div", "picker-channel");
+          field.appendChild(el("span", "picker-channel__label", label));
+          const input = document.createElement("input");
+          input.type = "number";
+          input.className = "nb-input";
+          input.id = `channel${i}`;
+          input.min = "0";
+          input.max = String(maxes[i]);
+          input.dataset.action = "color-channel";
+          input.dataset.channel = String(i);
+          input.title = `${label} channel (0–${maxes[i]})`;
+          field.appendChild(input);
+          return field;
+        })
+      );
+    }
+
+    // Update values (skip focused field so user input isn't clobbered)
+    for (let i = 0; i < 3; i++) {
+      const input = $(`channel${i}`);
+      if (active !== input) {
+        input.value = values[i];
+        input.classList.remove("nb-input--error");
+      }
+    }
+  } else {
+    if (needsRebuild) {
+      container.dataset.format = state.format;
+      const input = document.createElement("input");
+      input.className = "nb-input";
+      input.id = "colorInput";
+      input.dataset.action = "color-input";
+      input.title = "Enter color value in the selected format";
+      if (state.format === "ansi") {
+        input.type = "number";
+        input.min = "0";
+        input.max = "255";
+        input.step = "1";
+      } else {
+        input.type = "text";
+        if (state.format === "hex") input.maxLength = 7;
+      }
+      container.replaceChildren(input);
+    }
+    const input = $("colorInput");
+    if (active !== input) {
+      input.value = formatColor(state.color, state.format);
+      input.placeholder = FORMAT_PLACEHOLDERS[state.format];
+      input.classList.remove("nb-input--error");
+    }
+  }
 };
 
 const renderInputPreview = () => {
@@ -409,15 +664,13 @@ const setColorWheel = hex => {
   wheelReady = true;
 };
 
-// ==================== HEX INPUT ====================
-// Shared validation for both the main hex input and contrast BG input.
-// On input: strip invalid chars, show error for incomplete hex, apply valid colors live.
-// On blur: expand shorthand (e.g. #f57 → #ff5577) and format the field.
+// ==================== COLOR INPUT ====================
+// On input: validate live, show error for invalid, apply valid colors.
+// On blur: normalize value (format canonical string) and apply.
 
 /**
- * Live input handler — strips non-hex chars, toggles error state,
- * returns resolved hex if valid (3 or 6 digits), null otherwise.
- * Does NOT expand shorthand (that happens on blur).
+ * Live hex-only input handler (used for contrast BG which doesn't have format dropdown).
+ * Strips non-hex chars, keeps "#" prefix, toggles error state.
  */
 const handleHexInput = input => {
   const raw = input.value.replace(/[^a-f0-9]/gi, "");
@@ -428,7 +681,7 @@ const handleHexInput = input => {
   return resolved;
 };
 
-/** Blur handler — expand shorthand, format field, apply color via callback. */
+/** Blur handler for hex-only input — expand shorthand, apply via callback. */
 const handleHexBlur = (input, apply) => {
   const raw = input.value.replace(/[^a-f0-9]/gi, "");
   const resolved = resolveHex(raw);
@@ -437,6 +690,41 @@ const handleHexBlur = (input, apply) => {
     input.classList.remove("nb-input--error");
     apply(resolved.toLowerCase());
   } else if (raw.length === 0) {
+    input.classList.remove("nb-input--error");
+  }
+};
+
+/**
+ * Live handler for the format-aware color input.
+ * Parses in state.format, toggles error state, returns resolved hex or null.
+ */
+const handleColorInput = input => {
+  const val = input.value;
+  const resolved = parseColorByFormat(val, state.format);
+  input.classList.toggle("nb-input--error", val.trim().length > 0 && !resolved);
+  return resolved;
+};
+
+/** Blur handler for the format-aware color input — normalize value and apply. */
+const handleColorBlur = (input, apply) => {
+  let val = input.value;
+
+  // ANSI: clamp out-of-range numbers to 0–255 on blur
+  if (state.format === "ansi") {
+    const n = parseFloat(val);
+    if (!isNaN(n)) {
+      const clamped = Math.min(255, Math.max(0, Math.floor(n)));
+      val = String(clamped);
+      input.value = val;
+    }
+  }
+
+  const resolved = parseColorByFormat(val, state.format);
+  if (resolved) {
+    input.value = formatColor(resolved, state.format);
+    input.classList.remove("nb-input--error");
+    apply(resolved);
+  } else if (val.trim().length === 0) {
     input.classList.remove("nb-input--error");
   }
 };
@@ -473,13 +761,21 @@ const setupEvents = () => {
     }
   });
 
+  // --- Format select (change event) ---
+  bento.addEventListener("change", e => {
+    if (e.target.dataset.action === "format-select") {
+      const fmt = e.target.value;
+      if (FORMATS.includes(fmt)) setState({ format: fmt });
+    }
+  });
+
   // --- Live input actions ---
   bento.addEventListener("input", e => {
     const { target } = e;
     const { action } = target.dataset;
 
-    if (action === "hex-input") {
-      const result = handleHexInput(target);
+    if (action === "color-input") {
+      const result = handleColorInput(target);
       if (result) {
         setColorWheel(result);
         setState({ color: result.toLowerCase() });
@@ -489,15 +785,20 @@ const setupEvents = () => {
       if (result) {
         setState({ contrastBg: result.toLowerCase() });
       }
-    } else if (action === "rgb-input") {
-      const v = Math.min(255, Math.max(0, parseInt(target.value, 10)));
-      if (isNaN(v)) return;
-      const r = parseInt($("rInput").value, 10) || 0;
-      const g = parseInt($("gInput").value, 10) || 0;
-      const b = parseInt($("bInput").value, 10) || 0;
-      const hex = tinycolor({ r, g, b }).toHexString();
-      setColorWheel(hex);
-      setState({ color: hex });
+    } else if (action === "color-channel") {
+      // Flag out-of-range values with error state (live feedback)
+      const i = parseInt(target.dataset.channel, 10);
+      const { maxes } = CHANNEL_CONFIG[state.format];
+      const raw = parseFloat(target.value);
+      const outOfRange = !isNaN(raw) && (raw < 0 || raw > maxes[i]);
+      target.classList.toggle("nb-input--error", outOfRange);
+
+      const values = [0, 1, 2].map(idx => parseFloat($(`channel${idx}`).value) || 0);
+      const hex = channelsToHex(values, state.format);
+      if (hex) {
+        setColorWheel(hex);
+        setState({ color: hex.toLowerCase() });
+      }
     } else if (action === "slider-input") {
       const val = parseFloat(target.value) || 0;
       styleSlider(target);
@@ -516,11 +817,23 @@ const setupEvents = () => {
     const { target } = e;
     const { action } = target.dataset;
 
-    if (action === "hex-input") {
-      handleHexBlur(target, hex => {
+    if (action === "color-input") {
+      handleColorBlur(target, hex => {
         setColorWheel(hex);
         setState({ color: hex });
       });
+    } else if (action === "color-channel") {
+      // Clamp this channel to its max, clear error, then rebuild color from all 3 channels
+      const i = parseInt(target.dataset.channel, 10);
+      const { maxes } = CHANNEL_CONFIG[state.format];
+      target.value = Math.min(maxes[i], Math.max(0, parseFloat(target.value) || 0));
+      target.classList.remove("nb-input--error");
+      const values = [0, 1, 2].map(idx => parseFloat($(`channel${idx}`).value) || 0);
+      const hex = channelsToHex(values, state.format);
+      if (hex) {
+        setColorWheel(hex);
+        setState({ color: hex.toLowerCase() });
+      }
     } else if (action === "contrast-bg-input") {
       handleHexBlur(target, hex => {
         setState({ contrastBg: hex });
