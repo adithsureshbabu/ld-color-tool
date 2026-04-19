@@ -8,10 +8,13 @@ Built with a neo-brutalist UI using a [portable design system](#neo-brutalist-de
 
 - **Lighten / Darken** - Adjust any color by a precise percentage using an interactive slider
 - **Invert** - Flip a color to its RGB complement
+- **Multi-format input** - Pick a format (HEX, RGB, HSL, HSV, ANSI) and enter values via single field or per-channel inputs with live validation and error states
+- **Smart hex input** - Accepts 3-char shorthand (`#f57` → `#ff5577`) with inline validation and error feedback
 - **Multi-format output** - View results in HEX, RGB, HSL, HSV, and ANSI with one-click copy
 - **Contrast checker** - WCAG 2.1 compliance check (AA, AA+, AAA) against a configurable background
-- **Shade scale** - Tailwind-style 11-step shade ramp (50-950) generated from the output color
-- **Color harmonies** - Complementary, analogous, triadic, and split-complementary palettes
+- **Shade scale** - Tailwind-style 11-step shade ramp (50-950), horizontally scrollable on mobile
+- **Color harmonies** - Complementary, analogous, triadic, and split-complementary palettes; click a swatch to set it as input
+- **Reset** - One-click reset of amount and invert (preserves color and mode)
 - **JSON output** - Append `format=json` to get all computed data as JSON
 - **Deep-linking** - Share exact color states via URL query parameters
 - **Responsive** - Bento grid layout adapts across desktop, tablet, and mobile
@@ -33,15 +36,27 @@ Share a specific color state by appending query params:
 
 ```
 ?mode=darken&color=ff6b6b&amount=60&invert=true
+?mode=lighten&color=255,107,107&fmt=rgb&amount=30
 ```
 
 | Param | Values | Default |
 |---|---|---|
 | `mode` | `lighten`, `darken` | `lighten` |
-| `color` | hex without `#` | `0099dd` |
-| `amount` | `0` - `100` | `0` |
+| `color` | value depends on `fmt` (see below) | `0099dd` |
+| `amount` | `0` - `100` | `40` |
 | `invert` | `true`, `false` | `false` |
+| `fmt` | `hex`, `rgb`, `hsl`, `hsv`, `ansi` | `hex` |
 | `format` | `json` | *(none)* |
+
+The `color` value format follows the selected `fmt`:
+
+| fmt | color format | example |
+|---|---|---|
+| `hex` | `RRGGBB` or `RGB` (shorthand) | `ff6b6b` |
+| `rgb` | `r,g,b` (0-255 each) | `255,107,107` |
+| `hsl` | `h,s,l` (h 0-360, s/l 0-100) | `0,100,71` |
+| `hsv` | `h,s,v` (h 0-360, s/v 0-100) | `0,58,100` |
+| `ansi` | integer `0` - `255` | `203` |
 
 ### JSON Output
 
